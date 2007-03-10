@@ -3482,17 +3482,22 @@ bool Parser::parsePostfixExpression(ExpressionAST *&node)
         std::size_t castOp = session->token_stream->cursor();
         session->token_stream->nextToken();
 
+        CppCastExpressionAST *ast = CreateNode<CppCastExpressionAST>(session->mempool);
+
+        ast->left_angle = session->token_stream->cursor();
         CHECK('<');
         TypeIdAST *typeId = 0;
         parseTypeId(typeId);
+        ast->right_angle = session->token_stream->cursor();
         CHECK('>');
 
+        ast->left_paren = session->token_stream->cursor();
         CHECK('(');
         ExpressionAST *expr = 0;
         parseCommaExpression(expr);
+        ast->right_paren = session->token_stream->cursor();
         CHECK(')');
 
-        CppCastExpressionAST *ast = CreateNode<CppCastExpressionAST>(session->mempool);
         ast->op = castOp;
         ast->type_id = typeId;
         ast->expression = expr;
@@ -3556,6 +3561,9 @@ bool Parser::parsePostfixExpression(ExpressionAST *&node)
   TypeSpecifierAST *typeSpec = 0;
   ExpressionAST *expr = 0;
 
+  std::size_t left_paren;
+  std::size_t right_paren;
+
   // let's try to parse a type
   NameAST *name = 0;
   if (parseName(name, true))
@@ -3584,11 +3592,13 @@ bool Parser::parsePostfixExpression(ExpressionAST *&node)
   if (!expr && parseSimpleTypeSpecifier(typeSpec)
       && session->token_stream->lookAhead() == '(')
     {
+      left_paren = session->token_stream->cursor();
+
       session->token_stream->nextToken(); // skip '('
       parseCommaExpression(expr);
-/*      std::size_t paren = session->token_stream->cursor();*/
+
+      right_paren = session->token_stream->cursor();
       CHECK(')');
-/*      ast_cast<SimpleTypeSpecifierAST*>(typeSpec)->right_paren = paren;*/
     }
   else if (expr)
     {
@@ -3615,6 +3625,10 @@ bool Parser::parsePostfixExpression(ExpressionAST *&node)
   if (sub_expressions || !node || typeSpec)
     {
       PostfixExpressionAST *ast = CreateNode<PostfixExpressionAST>(session->mempool);
+
+      ast->left_paren = left_paren;
+      ast->right_paren = right_paren;
+
       ast->type_specifier = typeSpec;
       ast->expression = expr;
       ast->sub_expressions = sub_expressions;

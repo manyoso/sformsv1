@@ -319,6 +319,11 @@ struct CppCastExpressionAST: public ExpressionAST
 {
   DECLARE_AST_NODE(CppCastExpression)
 
+  std::size_t left_angle;
+  std::size_t right_angle;
+  std::size_t left_paren;
+  std::size_t right_paren;
+
   std::size_t op;
   TypeIdAST *type_id;
   ExpressionAST *expression;
@@ -627,8 +632,6 @@ struct PostfixExpressionAST: public ExpressionAST
 
   std::size_t left_paren;
   std::size_t right_paren;
-  std::size_t left_angle;
-  std::size_t right_angle;
 
   TypeSpecifierAST *type_specifier;
   ExpressionAST *expression;

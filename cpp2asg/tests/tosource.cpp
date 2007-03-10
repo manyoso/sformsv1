@@ -248,6 +248,11 @@ void ToSource::visitClassSpecifier(ClassSpecifierAST *node)
 
 void ToSource::visitCppCastExpression(CppCastExpressionAST *node)
 {
+  appendToken(node->left_angle);
+  appendToken(node->right_angle);
+  appendToken(node->left_paren);
+  appendToken(node->right_paren);
+
   appendToken(node->op);
   DefaultVisitor::visitCppCastExpression(node);
 }
@@ -432,6 +437,8 @@ void ToSource::visitParameterDeclarationClause(ParameterDeclarationClauseAST *no
 
 void ToSource::visitPostfixExpression(PostfixExpressionAST *node)
 {
+  appendToken(node->left_paren);
+  appendToken(node->right_paren);
   DefaultVisitor::visitPostfixExpression(node);
 }
 

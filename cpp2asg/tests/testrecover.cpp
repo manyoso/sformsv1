@@ -7,7 +7,7 @@
 #include <parsesession.h>
 
 TestRecover::TestRecover() {
-  QDir d("/home/adam/dev/sforms/cpp2asg/tests/files");
+  QDir d("/home/manyoso/dev/sforms/cpp2asg/tests/files");
   QFileInfoList infos = d.entryInfoList(QDir::Files | QDir::Readable, QDir::Name);
   foreach (QFileInfo f, infos) {
     m_files << f.absoluteFilePath();
