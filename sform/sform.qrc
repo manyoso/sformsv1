@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource prefix="/code">
+    <directory>.</directory>
+    <file>sform.qrc</file>
+    <file>sform.pro</file>
+    <file>main.cpp</file>
+    <file>sform.cpp</file>
+    <file>sform.h</file>
+    <file>code.cpp</file>
+    <file>code.h</file>
+  </qresource>
+</RCC>
