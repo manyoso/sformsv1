@@ -80,7 +80,9 @@ void SForm::reproduce()
         QFile f((*it));
         Q_ASSERT(f.exists());
         Q_ASSERT(f.open(QFile::ReadOnly));
-        out << f.readAll();
+        QByteArray bytes = f.readAll();
+        out << bytes.size();
+        out << bytes.data();
     }
 
     _socket->write(block);

@@ -3,7 +3,7 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-    : QLocalServer(parent)
+    : QLocalServer(parent), _blockSize(0)
 {
     if (!listen(QLatin1String("sform"))) {
         qDebug() << "Unable to start the sform server:"
@@ -31,6 +31,7 @@ void Server::establishConnection()
     connect(clientConnection, SIGNAL(readyRead()),
             this, SLOT(readClientData()));
 
+    _blockSize = 0;
     clientConnection->waitForReadyRead(-1);
 }
 
@@ -43,7 +44,15 @@ void Server::readClientData()
     }
 
     QDataStream in(clientConnection);
+    if (_blockSize == 0) {
+        in >> _blockSize;
+    }
+
+    if (clientConnection->bytesAvailable() < _blockSize)
+        return;
+
     char *data;
     in >> data;
-    qDebug() << data;
+
+    qDebug() << "data" << data;
 }

@@ -13,6 +13,9 @@ public:
 private Q_SLOTS:
     void establishConnection();
     void readClientData();
+
+private:
+    int _blockSize;
 };
 
 

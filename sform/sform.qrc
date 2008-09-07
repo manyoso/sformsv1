@@ -5,6 +5,6 @@
     <file>sform.pro</file>
     <file>sform.cpp</file>
     <file>sform.h</file>
-    <file>tmp/sform_all.s</file>
+    <file>sform_all.s</file>
   </qresource>
 </RCC>
