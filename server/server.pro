@@ -10,3 +10,4 @@ RCC_DIR = tmp
 TEMPLATE = app
 TARGET = server
 CONFIG += qt
+QT += core network

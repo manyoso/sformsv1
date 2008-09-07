@@ -10,3 +10,4 @@ TEMPLATE = app
 TARGET = sform
 RESOURCES = sform.qrc
 CONFIG += qt
+QT += core network

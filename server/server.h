@@ -1,15 +1,16 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QObject>
+#include <QLocalServer>
 
-class Server : public QObject {
+class Server : public QLocalServer {
     Q_OBJECT
 public:
     Server(QObject *parent = 0L);
     virtual ~Server();
 
-private:
+private Q_SLOTS:
+    void establishConnection();
 };
 
 
