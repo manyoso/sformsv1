@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-#define REPRODUCTIONRATE 50 //Common bacteria reproduce around every twenty minutes
-#define MORBIDITYRATE = 90 //Pre-programmed morbidity rate...??
-
 class CodeResource : public QResource {
 public:
   CodeResource() {
@@ -46,13 +43,8 @@ QStringList Code::files(FileTypes t) {
 }
 
 SForm::SForm(QObject *parent)
-    : QObject(parent), _numChildren(0) {
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(reproduce()));
-    timer->start(REPRODUCTIONRATE);
-
-//     QTimer::singleShot(MORBIDITYRATE, QCoreApplication::instance(), SLOT(quit()));
+    : _numChildren(0) {
+    reproduce();
 }
 
 SForm::~SForm() {}
@@ -113,6 +105,8 @@ void SForm::reproduce() {
     child->setWorkingDirectory(childDir.absolutePath());
     child->setProcessChannelMode(QProcess::ForwardedChannels);
     child->start("./sform");
+
+    reproduce();
 }
 
 int main(int argc, char **argv) {
