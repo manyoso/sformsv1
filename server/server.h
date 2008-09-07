@@ -8,21 +8,21 @@
 #include <QProcess>
 
 class Server : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  Server(QObject *parent = 0L);
-  virtual ~Server();
+    Server(QObject *parent = 0L);
+    virtual ~Server();
 
-  Q_PID createSForm();
+    Q_PID createSForm();
 
-private slots:
-  void readyReadStandardError();
-  void readyReadStandardOutput();
-  void sformDied(int exitCode, QProcess::ExitStatus exitStatus);
+private Q_SLOTS:
+    void readyReadStandardError();
+    void readyReadStandardOutput();
+    void sformDied(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  QMap<Q_PID, QProcess*> _sformMap;
-  QHash<QProcess*, Q_PID> _sformHash;
+    QMap<Q_PID, QProcess*> _sformMap;
+    QHash<QProcess*, Q_PID> _sformHash;
 };
 
 

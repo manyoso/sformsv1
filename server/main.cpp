@@ -3,14 +3,14 @@
 #include "server.h"
 
 int main(int argc, char **argv) {
-  QCoreApplication *a = new QCoreApplication(argc, argv);
-  QCoreApplication::setOrganizationDomain("treat.org");
-  QCoreApplication::setApplicationName("server");
+    QCoreApplication *a = new QCoreApplication(argc, argv);
+    QCoreApplication::setOrganizationDomain("treat.org");
+    QCoreApplication::setApplicationName("server");
 
-  Server server;
-  server.createSForm();
+    Server server;
+    server.createSForm();
 
-  int rc = a->exec();
+    int rc = a->exec();
 
-  return rc;
+    return rc;
 }

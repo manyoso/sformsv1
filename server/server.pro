@@ -4,7 +4,9 @@ SOURCES += main.cpp \
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
+UI_DIR = tmp
+RCC_DIR = tmp
 
 TEMPLATE = app
 TARGET = server
-CONFIG += qt debug warn_on console silent
+CONFIG += qt
