@@ -8,7 +8,6 @@ int main(int argc, char **argv) {
     QCoreApplication::setApplicationName("server");
 
     Server server;
-    server.createSForm();
 
     int rc = a->exec();
 
