@@ -13,9 +13,9 @@ public:
         All = Source | Header | Project | Resource,
     };
 
-  Q_DECLARE_FLAGS(FileTypes, FileType)
+    Q_DECLARE_FLAGS(FileTypes, FileType)
 
-  static QStringList files(FileTypes t = All );
+    static QStringList files(FileTypes t = All);
 
 private:
     Code() {}
@@ -24,9 +24,9 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Code::FileTypes)
 
-class SForm : public QObject {
+class SForm {
 public:
-    SForm(QObject *parent = 0L);
+    SForm();
     virtual ~SForm();
 
 private:

@@ -4,45 +4,45 @@
 
 class CodeResource : public QResource {
 public:
-  CodeResource() {
-    setFileName(":/code");
-  }
-  virtual ~CodeResource() {}
+    CodeResource() {
+        setFileName(":/code");
+    }
+    virtual ~CodeResource() {}
 
-  QStringList files() const {
-    return children();
-  }
+    QStringList files() const {
+        return children();
+    }
 };
 
 static const CodeResource _resource = CodeResource();
 
 QStringList Code::files(FileTypes t) {
 
-  QStringList filter;
-  QStringList files = _resource.files();
-  files.replaceInStrings(QRegExp("^(.*)$"), _resource.absoluteFilePath() + "/\\1");
+    QStringList filter;
+    QStringList files = _resource.files();
+    files.replaceInStrings(QRegExp("^(.*)$"), _resource.absoluteFilePath() + "/\\1");
 
-  if (t & Source) {
-    filter += files.filter(".cpp");
-  }
+    if (t & Source) {
+        filter += files.filter(".cpp");
+    }
 
-  if (t & Header) {
-    filter += files.filter(".h");
-  }
+    if (t & Header) {
+        filter += files.filter(".h");
+    }
 
-  if (t & Project) {
-    filter += files.filter(".pro");
-    filter += files.filter(".pri");
-  }
+    if (t & Project) {
+        filter += files.filter(".pro");
+        filter += files.filter(".pri");
+    }
 
-  if (t & Resource) {
-    filter += files.filter(".qrc");
-  }
+    if (t & Resource) {
+        filter += files.filter(".qrc");
+    }
 
-  return filter;
+    return filter;
 }
 
-SForm::SForm(QObject *parent)
+SForm::SForm()
     : _numChildren(0) {
     reproduce();
 }
@@ -72,9 +72,9 @@ void SForm::reproduce() {
     QStringList files = Code::files();
     QStringList::ConstIterator it = files.begin();
     for (; it != files.end(); ++it) {
-      QFile f((*it));
-      Q_ASSERT(f.exists());
-      Q_ASSERT(f.copy(childDir.absolutePath() + QDir::separator() + QFileInfo(f).fileName()));
+        QFile f((*it));
+        Q_ASSERT(f.exists());
+        Q_ASSERT(f.copy(childDir.absolutePath() + QDir::separator() + QFileInfo(f).fileName()));
     }
 
     //2. Compile them into new executable
@@ -110,13 +110,13 @@ void SForm::reproduce() {
 }
 
 int main(int argc, char **argv) {
-  QCoreApplication *a = new QCoreApplication(argc, argv);
-  QCoreApplication::setOrganizationDomain("treat.org");
-  QCoreApplication::setApplicationName("sform");
+    QCoreApplication *a = new QCoreApplication(argc, argv);
+    QCoreApplication::setOrganizationDomain("treat.org");
+    QCoreApplication::setApplicationName("sform");
 
-  SForm sform;
+    SForm sform;
 
-  int rc = a->exec();
+    int rc = a->exec();
 
-  return rc;
+    return rc;
 }
