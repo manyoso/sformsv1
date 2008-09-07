@@ -24,9 +24,9 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Code::FileTypes)
 
-class SForm {
+class SForm : public QObject {
 public:
-    SForm();
+    SForm(QObject *parent = 0L);
     virtual ~SForm();
 
 private:

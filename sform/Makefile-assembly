@@ -1,0 +1,45 @@
+CC            = gcc
+CXX           = g++
+DEFINES       = -DQT_GUI_LIB -DQT_CORE_LIB
+CFLAGS        = -S -Wall -W -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -S -Wall -W -D_REENTRANT $(DEFINES)
+INCPATH       = -I../../../../kde/trunk/qt-4.4.0/mkspecs/linux-g++ -I. -I../../../../kde/build/home/kde/trunk/qt-4.4.0/include/QtCore -I../../../../kde/build/home/kde/trunk/qt-4.4.0/include/QtCore -I../../../../kde/build/home/kde/trunk/qt-4.4.0/include/QtGui -I../../../../kde/build/home/kde/trunk/qt-4.4.0/include/QtGui -I../../../../kde/build/home/kde/trunk/qt-4.4.0/include -Itmp -Itmp
+LINK          = g++
+LFLAGS        = -Wl,-rpath,/home/kde/build/home/kde/trunk/qt-4.4.0/lib
+LIBS          = $(SUBLIBS)  -L/home/kde/build/home/kde/trunk/qt-4.4.0/lib -lQtGui -lQtCore -lpthread
+
+####### Files
+
+SOURCES       = tmp/qrc_sform.cpp sform.cpp
+ASSEMBLY       = tmp/sform_all.s
+
+first: all
+####### Implicit rules
+
+.SUFFIXES: .o .c .cpp .cc .cxx .C
+
+.cpp.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+####### Build rules
+
+all: $(ASSEMBLY) tmp/sform_all.o
+	$(LINK) $(LFLAGS) $(LIBS) -o tmp/sform tmp/sform_all.o
+
+tmp/qrc_sform.cpp:
+	/home/kde/build/home/kde/trunk/qt-4.4.0/bin/rcc -name sform sform.qrc -o tmp/qrc_sform.cpp
+
+####### Concatenate all files
+
+tmp/sform_all.cpp: tmp/qrc_sform.cpp
+	cat tmp/qrc_sform.cpp sform.cpp > tmp/sform_all.cpp
+
+####### Generate assembly
+
+tmp/sform_all.s: tmp/sform_all.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o tmp/sform_all.s tmp/sform_all.cpp
+
+####### Generate object file
+
+tmp/sform_all.o: tmp/sform_all.s
+	as --traditional-format -o tmp/sform_all.o tmp/sform_all.s

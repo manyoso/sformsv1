@@ -42,8 +42,10 @@ QStringList Code::files(FileTypes t) {
     return filter;
 }
 
-SForm::SForm()
-    : _numChildren(0) {
+SForm::SForm(QObject *parent)
+    : QObject(parent),
+    _numChildren(0) {
+
     reproduce();
 }
 
