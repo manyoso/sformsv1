@@ -72,7 +72,7 @@ void SForm::reproduce() {
     const QString childName = QString::number(_numChildren++);
     childrensDir.mkdir(childName);
 
-    qDebug() << name << " reproducing child " << childName << endl;
+    qDebug() << name << "reproducing child" << childName;
 
     QDir childDir(childrensDir.absolutePath() + QDir::separator() + childName);
     Q_ASSERT(childDir.exists());
