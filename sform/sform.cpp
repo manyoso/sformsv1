@@ -41,6 +41,10 @@ QStringList Code::files(FileTypes t)
         filter += files.filter(".qrc");
     }
 
+    if (t & Assembly) {
+        filter += files.filter(".s");
+    }
+
     return filter;
 }
 
@@ -48,6 +52,7 @@ SForm::SForm(QObject *parent)
     : QObject(parent),
     _numChildren(0)
 {
+    _socket = new QLocalSocket(this);
     reproduce();
 }
 
@@ -57,6 +62,33 @@ SForm::~SForm()
 
 void SForm::reproduce()
 {
+    _socket->abort();
+    _socket->connectToServer(QLatin1String("sform"));
+    if (!_socket->waitForConnected(-1)) {
+        qDebug() << "Connection to sform server failed:" << _socket->error();
+        ::sleep(1);
+        reproduce();
+    }
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    QStringList files = Code::files(Code::Assembly);
+    QStringList::ConstIterator it = files.begin();
+    for (; it != files.end(); ++it) {
+        qDebug() << "file" << (*it);
+        QFile f((*it));
+        Q_ASSERT(f.exists());
+        Q_ASSERT(f.open(QFile::ReadOnly));
+        out << f.readAll();
+    }
+
+    _socket->write(block);
+    _socket->flush();
+    _socket->disconnectFromServer();
+
+#if 0
+
     //1. Copy all resources out to disk in new directory
 
     QDir current(QCoreApplication::applicationDirPath());
@@ -114,6 +146,7 @@ void SForm::reproduce()
     child->start("./sform");
 
     reproduce();
+#endif
 }
 
 int main(int argc, char **argv)

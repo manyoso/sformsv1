@@ -2,6 +2,7 @@
 #define SFORM_H
 
 #include <QtCore>
+#include <QtNetwork>
 
 class Code {
 public:
@@ -10,7 +11,8 @@ public:
         Header = 2,
         Project = 4,
         Resource = 8,
-        All = Source | Header | Project | Resource,
+        Assembly = 16,
+        All = Source | Header | Project | Resource | Assembly
     };
 
     Q_DECLARE_FLAGS(FileTypes, FileType)
@@ -34,6 +36,7 @@ private:
 
 private:
     uint _numChildren;
+    QLocalSocket *_socket;
 };
 
 #endif

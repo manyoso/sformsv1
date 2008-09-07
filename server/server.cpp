@@ -17,8 +17,33 @@ Server::Server(QObject *parent)
 
 Server::~Server()
 {
+    close();
 }
 
-void Server::establishConnection() {
+void Server::establishConnection()
+{
     qDebug() << "establishConnection";
+
+    QLocalSocket *clientConnection = nextPendingConnection();
+    connect(clientConnection, SIGNAL(disconnected()),
+            clientConnection, SLOT(deleteLater()));
+
+    connect(clientConnection, SIGNAL(readyRead()),
+            this, SLOT(readClientData()));
+
+    clientConnection->waitForReadyRead(-1);
+}
+
+void Server::readClientData()
+{
+    qDebug() << "reading client data...";
+    QLocalSocket *clientConnection = qobject_cast<QLocalSocket*>(sender());
+    if (!clientConnection) {
+        qDebug() << "client connection broken";
+    }
+
+    QDataStream in(clientConnection);
+    char *data;
+    in >> data;
+    qDebug() << data;
 }
