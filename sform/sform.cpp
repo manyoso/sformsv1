@@ -4,20 +4,22 @@
 
 class CodeResource : public QResource {
 public:
-    CodeResource() {
+    CodeResource()
+    {
         setFileName(":/code");
     }
     virtual ~CodeResource() {}
 
-    QStringList files() const {
+    QStringList files() const
+    {
         return children();
     }
 };
 
 static const CodeResource _resource = CodeResource();
 
-QStringList Code::files(FileTypes t) {
-
+QStringList Code::files(FileTypes t)
+{
     QStringList filter;
     QStringList files = _resource.files();
     files.replaceInStrings(QRegExp("^(.*)$"), _resource.absoluteFilePath() + "/\\1");
@@ -44,14 +46,17 @@ QStringList Code::files(FileTypes t) {
 
 SForm::SForm(QObject *parent)
     : QObject(parent),
-    _numChildren(0) {
-
+    _numChildren(0)
+{
     reproduce();
 }
 
-SForm::~SForm() {}
+SForm::~SForm()
+{
+}
 
-void SForm::reproduce() {
+void SForm::reproduce()
+{
     //1. Copy all resources out to disk in new directory
 
     QDir current(QCoreApplication::applicationDirPath());
@@ -111,7 +116,8 @@ void SForm::reproduce() {
     reproduce();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     QCoreApplication *a = new QCoreApplication(argc, argv);
     QCoreApplication::setOrganizationDomain("treat.org");
     QCoreApplication::setApplicationName("sform");
