@@ -1,20 +1,40 @@
 #ifndef SFORM_H
 #define SFORM_H
 
-#include <QObject>
+#include <QtCore>
 
-class SForm : public QObject {
-  Q_OBJECT
+class Code {
 public:
-  SForm(QObject *parent = 0L);
-  virtual ~SForm();
+    enum FileType {
+        Source = 1,
+        Header = 2,
+        Project = 4,
+        Resource = 8,
+        All = Source | Header | Project | Resource,
+    };
 
-private slots:
-  void reproduce();
+  Q_DECLARE_FLAGS(FileTypes, FileType)
+
+  static QStringList files(FileTypes t = All );
 
 private:
-  uint _numChildren;
+    Code() {}
+    virtual ~Code() {}
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Code::FileTypes)
+
+class SForm : public QObject {
+    Q_OBJECT
+public:
+    SForm(QObject *parent = 0L);
+    virtual ~SForm();
+
+private slots:
+    void reproduce();
+
+private:
+    uint _numChildren;
+};
 
 #endif

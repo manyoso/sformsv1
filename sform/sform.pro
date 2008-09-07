@@ -1,15 +1,14 @@
-HEADERS += sform.h \
-           code.h 
-SOURCES += main.cpp \
-           sform.cpp \
-           code.cpp
+HEADERS += sform.h
+SOURCES += sform.cpp
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
+UI_DIR = tmp
+RCC_DIR = tmp
 
 TEMPLATE = app
 TARGET = sform
 RESOURCES = sform.qrc
 CONFIG += qt debug warn_on console
 
-QMAKE_CXXFLAGS += -O0 -fdump-translation-unit-all
+;QMAKE_CXXFLAGS += -S
