@@ -2,17 +2,41 @@
 
 #include <QDebug>
 
+#include <limits.h>
+#include <signal.h>
+
+#include <QFile>
+
+static void crashHandler(int sig)
+{
+    fprintf(stderr, "%s\n", strsignal(sig));
+    QFile::remove("/tmp/sform");
+    exit(128 + sig);
+}
+
 Server::Server(QObject *parent)
     : QLocalServer(parent), _blockSize(0)
 {
     if (!listen(QLatin1String("sform"))) {
         qDebug() << "Unable to start the sform server:"
                  << errorString();
-        close();
-        return;
+        exit(1);
     }
 
-    connect(this, SIGNAL(newConnection()), this, SLOT(establishConnection()));
+    signal(SIGINT,  crashHandler);    /* 2:   interrupt */
+    signal(SIGILL,  crashHandler);    /* 4:   illegal instruction (not reset when caught) */
+    signal(SIGTRAP, crashHandler);    /* 5:   trace trap (not reset when caught) */
+    signal(SIGFPE,  crashHandler);    /* 8:   floating point exception */
+    signal(SIGBUS,  crashHandler);    /* 10:  bus error */
+    signal(SIGSEGV, crashHandler);    /* 11:  segmentation violation */
+    signal(SIGSYS,  crashHandler);    /* 12:  bad argument to system call */
+    signal(SIGPIPE, crashHandler);    /* 13:  write on a pipe with no reader */
+    signal(SIGTERM, crashHandler);    /* 15:  terminate */
+    signal(SIGXCPU, crashHandler);    /* 24:  exceeded CPU time limit */
+    signal(SIGXFSZ, crashHandler);    /* 25:  exceeded file size limit */
+
+    connect(this, SIGNAL(newConnection()),
+            this, SLOT(establishConnection()));
 }
 
 Server::~Server()
@@ -23,7 +47,6 @@ Server::~Server()
 void Server::establishConnection()
 {
     qDebug() << "establishConnection";
-
     QLocalSocket *clientConnection = nextPendingConnection();
     connect(clientConnection, SIGNAL(disconnected()),
             clientConnection, SLOT(deleteLater()));
@@ -37,11 +60,9 @@ void Server::establishConnection()
 
 void Server::readClientData()
 {
-    qDebug() << "reading client data...";
+    qDebug() << "readClientData";
     QLocalSocket *clientConnection = qobject_cast<QLocalSocket*>(sender());
-    if (!clientConnection) {
-        qDebug() << "client connection broken";
-    }
+    Q_ASSERT(clientConnection);
 
     QDataStream in(clientConnection);
     if (_blockSize == 0) {
@@ -53,6 +74,4 @@ void Server::readClientData()
 
     char *data;
     in >> data;
-
-    qDebug() << "data" << data;
 }

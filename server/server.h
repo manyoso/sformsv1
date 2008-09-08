@@ -18,5 +18,4 @@ private:
     int _blockSize;
 };
 
-
 #endif
