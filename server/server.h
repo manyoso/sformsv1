@@ -14,6 +14,8 @@ private Q_SLOTS:
     void establishConnection();
     void readClientData();
 
+    void compileAssembly(char *data);
+
 private:
     int _blockSize;
 };

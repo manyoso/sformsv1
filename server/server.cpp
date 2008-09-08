@@ -6,6 +6,8 @@
 #include <signal.h>
 
 #include <QFile>
+#include <QProcess>
+#include <QStringList>
 
 static void crashHandler(int sig)
 {
@@ -60,7 +62,6 @@ void Server::establishConnection()
 
 void Server::readClientData()
 {
-    qDebug() << "readClientData";
     QLocalSocket *clientConnection = qobject_cast<QLocalSocket*>(sender());
     Q_ASSERT(clientConnection);
 
@@ -72,6 +73,47 @@ void Server::readClientData()
     if (clientConnection->bytesAvailable() < _blockSize)
         return;
 
+    qDebug() << "readClientData";
+
     char *data;
     in >> data;
+
+//     QFile file("out.s");
+//     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+//         return;
+//
+//     QTextStream out(&file);
+//     out << data;
+
+    compileAssembly(data);
+}
+
+void Server::compileAssembly(char *data)
+{
+    const uint hash = qHash(data);
+    const QString objectFile = QString("%1.o").arg(hash);
+    const QString asCommand = QString("as --traditional-format -o %1").arg(objectFile);
+
+    qDebug() << "calling:" << asCommand;
+
+    QStringList e = QProcess::systemEnvironment();
+    QProcess *assembler = new QProcess(this);
+    assembler->setEnvironment(e);
+    assembler->start(asCommand);
+    assembler->write(data);
+    assembler->closeWriteChannel();
+    Q_ASSERT(assembler->waitForFinished(-1));
+    delete assembler;
+    assembler = 0;
+
+    QString ldCommand = QString("g++ -Wl,-rpath,/home/kde/build/home/kde/trunk/qt-4.4.0/lib -L/home/kde/build/home/kde/trunk/qt-4.4.0/lib -lQtGui -lQtNetwork -lQtCore -lpthread -o %1 %2").arg(hash).arg(objectFile);
+
+    qDebug() << "calling:" << ldCommand;
+
+    QProcess *linker = new QProcess(this);
+    linker->setEnvironment(e);
+    linker->start(ldCommand);
+    Q_ASSERT(linker->waitForFinished(-1));
+    delete linker;
+    linker = 0;
 }
