@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QProcess>
 #include <QStringList>
+#include <QLibraryInfo>
 
 static void crashHandler(int sig)
 {
@@ -106,7 +107,10 @@ void Server::compileAssembly(char *data)
     delete assembler;
     assembler = 0;
 
-    QString ldCommand = QString("g++ -Wl,-rpath,/home/kde/build/home/kde/trunk/qt-4.4.0/lib -L/home/kde/build/home/kde/trunk/qt-4.4.0/lib -lQtGui -lQtNetwork -lQtCore -lpthread -o %1 %2").arg(hash).arg(objectFile);
+    QString libs = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+    QString ldCommand = QString("g++ -Wl,-rpath,%1 -L%2 -lQtGui -lQtNetwork"
+                                "-lQtCore -lpthread -o %3 %4")
+                                .arg(libs).arg(libs).arg(hash).arg(objectFile);
 
     qDebug() << "calling:" << ldCommand;
 
