@@ -10,8 +10,8 @@ LIBS          = $(SUBLIBS)  -L/home/kde/build/home/kde/trunk/qt-4.4.0/lib -lQtGu
 
 ####### Files
 
-SOURCES       = tmp/qrc_sform.cpp sform.cpp
-ASSEMBLY       = tmp/sform_all.s
+SOURCES       = sform.cpp
+ASSEMBLY       = tmp/sform.s
 
 first: all
 ####### Implicit rules
@@ -23,23 +23,22 @@ first: all
 
 ####### Build rules
 
-all: $(ASSEMBLY) tmp/sform_all.o
-	$(LINK) $(LFLAGS) $(LIBS) -o tmp/sform tmp/sform_all.o
+all: clean tmp quine tmp/sform.o
+	$(LINK) $(LFLAGS) $(LIBS) -o tmp/sform tmp/sform.o
 
-tmp/qrc_sform.cpp:
-	/home/kde/build/home/kde/trunk/qt-4.4.0/bin/rcc -name sform sform.qrc -o tmp/qrc_sform.cpp
+clean:
+	rm -rf tmp
 
-####### Concatenate all files
-
-tmp/sform_all.cpp: tmp/qrc_sform.cpp
-	cat tmp/qrc_sform.cpp sform.cpp > tmp/sform_all.cpp
+tmp:
+	mkdir tmp
 
 ####### Generate assembly
 
-tmp/sform_all.s: tmp/sform_all.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o tmp/sform_all.s tmp/sform_all.cpp
+quine: tmp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o tmp/sform.s sform.cpp
+	../asm-quine/asm-quine tmp/sform.s
 
 ####### Generate object file
 
-tmp/sform_all.o: tmp/sform_all.s
-	as --traditional-format -o tmp/sform_all.o tmp/sform_all.s
+tmp/sform.o:
+	as --traditional-format -o tmp/sform.o tmp/sform.s

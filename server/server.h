@@ -14,6 +14,7 @@ private Q_SLOTS:
     void establishConnection();
     void readClientData();
 
+    void diff(char *data);
     void compileAssembly(char *data);
 
 private:

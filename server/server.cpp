@@ -79,14 +79,21 @@ void Server::readClientData()
     char *data;
     in >> data;
 
-//     QFile file("out.s");
-//     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-//         return;
-//
-//     QTextStream out(&file);
-//     out << data;
-
+#if 0
     compileAssembly(data);
+#else
+    diff(data);
+#endif
+}
+
+void Server::diff(char *data)
+{
+    QFile file("out.s");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    out << data;
 }
 
 void Server::compileAssembly(char *data)
@@ -109,7 +116,7 @@ void Server::compileAssembly(char *data)
 
     QString libs = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
     QString ldCommand = QString("g++ -Wl,-rpath,%1 -L%2 -lQtGui -lQtNetwork"
-                                "-lQtCore -lpthread -o %3 %4")
+                                " -lQtCore -lpthread -o %3 %4")
                                 .arg(libs).arg(libs).arg(hash).arg(objectFile);
 
     qDebug() << "calling:" << ldCommand;

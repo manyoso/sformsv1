@@ -1,5 +1,4 @@
-HEADERS += sform.h
-SOURCES += sform.cpp
+SOURCES += main.cpp
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
@@ -7,6 +6,6 @@ UI_DIR = tmp
 RCC_DIR = tmp
 
 TEMPLATE = app
-TARGET = sform
+TARGET = asm-quine
 CONFIG += qt
-QT += core network
+QT += core
