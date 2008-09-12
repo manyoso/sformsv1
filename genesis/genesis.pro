@@ -1,6 +1,6 @@
-HEADERS += server.h
+HEADERS += genesis.h
 SOURCES += main.cpp \
-           server.cpp
+           genesis.cpp
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
@@ -8,6 +8,6 @@ UI_DIR = tmp
 RCC_DIR = tmp
 
 TEMPLATE = app
-TARGET = server
+TARGET = genesis
 CONFIG += qt
 QT += core network

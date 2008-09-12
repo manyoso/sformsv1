@@ -1,11 +1,14 @@
-#include "server.h"
+#include "genesis.h"
 
 #include <QDebug>
 
 #include <limits.h>
 #include <signal.h>
 
+#include <QDir>
 #include <QFile>
+#include <QTime>
+#include <QTimer>
 #include <QProcess>
 #include <QStringList>
 #include <QLibraryInfo>
@@ -18,11 +21,11 @@ static void crashHandler(int sig)
     exit(128 + sig);
 }
 
-Server::Server(QObject *parent)
+Genesis::Genesis(QObject *parent)
     : QLocalServer(parent), _blockSize(0)
 {
     if (!listen(QLatin1String("sform"))) {
-        qDebug() << "Unable to start the sform server:"
+        qDebug() << "Unable to start the sform genesis:"
                  << errorString();
         exit(1);
     }
@@ -41,14 +44,25 @@ Server::Server(QObject *parent)
 
     connect(this, SIGNAL(newConnection()),
             this, SLOT(establishConnection()));
+
+    _reaper = new QTimer(this);
+    _reaper->start(1000); //every second
+    connect(_reaper, SIGNAL(timeout()), this, SLOT(reap()));
 }
 
-Server::~Server()
+Genesis::~Genesis()
 {
     close();
+
+    QHash<qint64, QTime>::const_iterator it = _processTable.constBegin();
+    while (it != _processTable.constEnd()) {
+        qDebug() << "killing process:" << it.key();
+        Q_ASSERT(kill(it.key(), SIGTERM) == 0);
+        ++it;
+    }
 }
 
-void Server::establishConnection()
+void Genesis::establishConnection()
 {
     qDebug() << "establishConnection";
     QLocalSocket *clientConnection = nextPendingConnection();
@@ -62,7 +76,7 @@ void Server::establishConnection()
     clientConnection->waitForReadyRead(-1);
 }
 
-void Server::readClientData()
+void Genesis::readClientData()
 {
     QLocalSocket *clientConnection = qobject_cast<QLocalSocket*>(sender());
     Q_ASSERT(clientConnection);
@@ -87,7 +101,7 @@ void Server::readClientData()
 #endif
 }
 
-void Server::diff(char *data)
+void Genesis::diff(char *data)
 {
     QFile file("out.s");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -97,7 +111,7 @@ void Server::diff(char *data)
     out << data;
 }
 
-void Server::compileAssembly(char *data)
+void Genesis::compileAssembly(char *data)
 {
     const uint hash = qHash(data);
     const QString objectFile = QString("%1.o").arg(hash);
@@ -129,12 +143,18 @@ void Server::compileAssembly(char *data)
     delete linker;
     linker = 0;
 
+    qDebug() << "remove object file:" << objectFile;
+    QFile::remove(QCoreApplication::applicationDirPath() +
+                  QDir::separator() + objectFile);
+
     spawn(QString::number(hash));
 }
 
-void Server::spawn(const QString &path)
+void Genesis::spawn(const QString &file)
 {
-    QString spCommand = QString("%1/%2").arg(QCoreApplication::applicationDirPath()).arg(path);
+    QString spCommand = QCoreApplication::applicationDirPath() +
+                        QDir::separator() + file;
+
     qDebug() << "spawning:" << spCommand;
 
     qint64 pid;
@@ -143,8 +163,32 @@ void Server::spawn(const QString &path)
     spawn->setEnvironment(e);
     Q_ASSERT(spawn->startDetached(spCommand, QStringList() /*args*/, QString() /*working directory*/, &pid));
 
-    qDebug() << "spawn success pid=" << pid;
+    _processTable.insert(pid, QTime::currentTime());
+
+    qDebug() << "spawn success pid:" << pid;
 
     delete spawn;
     spawn = 0;
+
+    qDebug() << "remove executable:" << file;
+    QFile::remove(spCommand);
+}
+
+void Genesis::reap()
+{
+    if (_processTable.isEmpty())
+        return;
+
+    qDebug() << "reap";
+
+    //FIXME make this semi-random?
+    QMutableHashIterator<qint64, QTime> it(_processTable);
+    while (it.hasNext()) {
+        it.next();
+        if (qAbs(it.value().msecsTo(QTime::currentTime())) > 1000) {
+            qDebug() << "killing process:" << it.key();
+            Q_ASSERT(kill(it.key(), SIGTERM) == 0);
+            _processTable.remove(it.key());
+        }
+    }
 }

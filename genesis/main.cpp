@@ -1,14 +1,14 @@
 #include <QCoreApplication>
 
-#include "server.h"
+#include "genesis.h"
 
 int main(int argc, char **argv)
 {
     QCoreApplication *a = new QCoreApplication(argc, argv);
     QCoreApplication::setOrganizationDomain("treat.org");
-    QCoreApplication::setApplicationName("sform-server");
+    QCoreApplication::setApplicationName("sform-genesis");
 
-    Server server;
+    Genesis genesis;
 
     int rc = a->exec();
 
