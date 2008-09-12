@@ -16,6 +16,7 @@ private Q_SLOTS:
 
     void diff(char *data);
     void compileAssembly(char *data);
+    void spawn(const QString &path);
 
 private:
     int _blockSize;

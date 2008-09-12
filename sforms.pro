@@ -1,4 +1,4 @@
 #experimental
 TEMPLATE = subdirs
 CONFIG += ordered silent
-SUBDIRS = server sform
+SUBDIRS = asm-quine sform server

@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QStringList>
 #include <QLibraryInfo>
+#include <QCoreApplication>
 
 static void crashHandler(int sig)
 {
@@ -79,7 +80,7 @@ void Server::readClientData()
     char *data;
     in >> data;
 
-#if 0
+#if 1
     compileAssembly(data);
 #else
     diff(data);
@@ -102,7 +103,7 @@ void Server::compileAssembly(char *data)
     const QString objectFile = QString("%1.o").arg(hash);
     const QString asCommand = QString("as --traditional-format -o %1").arg(objectFile);
 
-    qDebug() << "calling:" << asCommand;
+    qDebug() << "assembling:" << asCommand;
 
     QStringList e = QProcess::systemEnvironment();
     QProcess *assembler = new QProcess(this);
@@ -119,7 +120,7 @@ void Server::compileAssembly(char *data)
                                 " -lQtCore -lpthread -o %3 %4")
                                 .arg(libs).arg(libs).arg(hash).arg(objectFile);
 
-    qDebug() << "calling:" << ldCommand;
+    qDebug() << "linking:" << ldCommand;
 
     QProcess *linker = new QProcess(this);
     linker->setEnvironment(e);
@@ -127,4 +128,23 @@ void Server::compileAssembly(char *data)
     Q_ASSERT(linker->waitForFinished(-1));
     delete linker;
     linker = 0;
+
+    spawn(QString::number(hash));
+}
+
+void Server::spawn(const QString &path)
+{
+    QString spCommand = QString("%1/%2").arg(QCoreApplication::applicationDirPath()).arg(path);
+    qDebug() << "spawning:" << spCommand;
+
+    qint64 pid;
+    QStringList e = QProcess::systemEnvironment();
+    QProcess *spawn = new QProcess(this);
+    spawn->setEnvironment(e);
+    Q_ASSERT(spawn->startDetached(spCommand, QStringList() /*args*/, QString() /*working directory*/, &pid));
+
+    qDebug() << "spawn success pid=" << pid;
+
+    delete spawn;
+    spawn = 0;
 }
