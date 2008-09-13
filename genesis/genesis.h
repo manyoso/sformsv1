@@ -20,12 +20,9 @@ private Q_SLOTS:
     void diff(char *data);
     void compileAssembly(char *data);
     void spawn(const QString &file);
-    void reap();
 
 private:
     int _blockSize;
-    QTimer *_reaper;
-    QHash<qint64, QTime> _processTable;
 };
 
 #endif

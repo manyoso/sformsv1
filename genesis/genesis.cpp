@@ -44,22 +44,11 @@ Genesis::Genesis(QObject *parent)
 
     connect(this, SIGNAL(newConnection()),
             this, SLOT(establishConnection()));
-
-    _reaper = new QTimer(this);
-    _reaper->start(1000); //every second
-    connect(_reaper, SIGNAL(timeout()), this, SLOT(reap()));
 }
 
 Genesis::~Genesis()
 {
     close();
-
-    QHash<qint64, QTime>::const_iterator it = _processTable.constBegin();
-    while (it != _processTable.constEnd()) {
-        qDebug() << "killing process:" << it.key();
-        Q_ASSERT(kill(it.key(), SIGTERM) == 0);
-        ++it;
-    }
 }
 
 void Genesis::establishConnection()
@@ -152,6 +141,12 @@ void Genesis::compileAssembly(char *data)
 
 void Genesis::spawn(const QString &file)
 {
+    QFile f("sform-process.list");
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        qDebug() << "Can not open sform process list!";
+        return; //don't spawn unless we can get a lock on the file
+    }
+
     QString spCommand = QCoreApplication::applicationDirPath() +
                         QDir::separator() + file;
 
@@ -163,7 +158,9 @@ void Genesis::spawn(const QString &file)
     spawn->setEnvironment(e);
     Q_ASSERT(spawn->startDetached(spCommand, QStringList() /*args*/, QString() /*working directory*/, &pid));
 
-    _processTable.insert(pid, QTime::currentTime());
+    QTextStream out(&f);
+    out << QString("%1 %2\n").arg(QString::number(pid)).arg(QTime::currentTime().toString());
+    f.close();
 
     qDebug() << "spawn success pid:" << pid;
 
@@ -172,23 +169,4 @@ void Genesis::spawn(const QString &file)
 
     qDebug() << "remove executable:" << file;
     QFile::remove(spCommand);
-}
-
-void Genesis::reap()
-{
-    if (_processTable.isEmpty())
-        return;
-
-    qDebug() << "reap";
-
-    //FIXME make this semi-random?
-    QMutableHashIterator<qint64, QTime> it(_processTable);
-    while (it.hasNext()) {
-        it.next();
-        if (qAbs(it.value().msecsTo(QTime::currentTime())) > 1000) {
-            qDebug() << "killing process:" << it.key();
-            Q_ASSERT(kill(it.key(), SIGTERM) == 0);
-            _processTable.remove(it.key());
-        }
-    }
 }
