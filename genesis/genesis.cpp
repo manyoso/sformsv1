@@ -98,6 +98,8 @@ void Genesis::diff(char *data)
 
     QTextStream out(&file);
     out << data;
+    out.flush();
+    file.flush();
 }
 
 void Genesis::compileAssembly(char *data)
@@ -160,6 +162,8 @@ void Genesis::spawn(const QString &file)
 
     QTextStream out(&f);
     out << QString("%1 %2\n").arg(QString::number(pid)).arg(QTime::currentTime().toString());
+    out.flush();
+    f.flush();
     f.close();
 
     qDebug() << "spawn success pid:" << pid;
@@ -169,4 +173,19 @@ void Genesis::spawn(const QString &file)
 
     qDebug() << "remove executable:" << file;
     QFile::remove(spCommand);
+
+    logSpawn(QStringList() << QString::number(pid));
+}
+
+void Genesis::logSpawn(const QStringList &spawn)
+{
+    QFile file("sform-spawn.list");
+    Q_ASSERT(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text));
+
+    QTextStream out(&file);
+    out << spawn.join(QChar('\n'));
+    out << QChar('\n');
+    out.flush();
+    file.flush();
+    file.close();
 }

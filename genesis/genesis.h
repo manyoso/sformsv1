@@ -22,6 +22,9 @@ private Q_SLOTS:
     void spawn(const QString &file);
 
 private:
+    void logSpawn(const QStringList &spawn);
+
+private:
     int _blockSize;
 };
 

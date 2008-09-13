@@ -16,6 +16,9 @@ private Q_SLOTS:
     void reap();
 
 private:
+    void logKill(const QStringList &killed);
+
+private:
     QTimer *_reaper;
 };
 
