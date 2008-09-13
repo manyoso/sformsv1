@@ -86,6 +86,7 @@ void Control::startReaper()
         QString command = QCoreApplication::applicationDirPath() +
                           QDir::separator() + QLatin1String("reaper");
         _reaper = new QProcess(this);
+        _reaper->setProcessChannelMode(QProcess::ForwardedChannels);
         _reaper->start(command);
     }
 
@@ -119,6 +120,7 @@ void Control::startGenesis()
         QString command = QCoreApplication::applicationDirPath() +
                           QDir::separator() + QLatin1String("genesis");
         _genesis = new QProcess(this);
+        _genesis->setProcessChannelMode(QProcess::ForwardedChannels);
         _genesis->start(command);
     }
 
