@@ -1,9 +1,8 @@
+include($$PWD/../sforms.pri)
+
 SOURCES += main.cpp
 
-OBJECTS_DIR = tmp
-MOC_DIR = tmp
-UI_DIR = tmp
-RCC_DIR = tmp
+DESTDIR = $$OUTPUT_DIR/bin
 
 TEMPLATE = app
 TARGET = asm-quine

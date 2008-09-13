@@ -4,13 +4,12 @@
 
 int main(int argc, char **argv)
 {
-    QCoreApplication *a = new QCoreApplication(argc, argv);
+    QCoreApplication app(argc, argv);
     QCoreApplication::setOrganizationDomain("treat.org");
     QCoreApplication::setApplicationName("sform-genesis");
 
-    Genesis genesis;
+    Genesis genesis(&app);
 
-    int rc = a->exec();
-
+    int rc = app.exec();
     return rc;
 }

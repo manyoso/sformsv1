@@ -49,13 +49,12 @@ void SForm::reproduce()
 
 int main(int argc, char **argv)
 {
-    QCoreApplication *a = new QCoreApplication(argc, argv);
+    QCoreApplication app(argc, argv);
     QCoreApplication::setOrganizationDomain("treat.org");
     QCoreApplication::setApplicationName("sform");
 
-    SForm sform;
+    SForm sform(&app);
 
-    int rc = a->exec();
-
+    int rc = app.exec();
     return rc;
 }

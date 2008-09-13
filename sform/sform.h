@@ -6,7 +6,7 @@
 
 class SForm : public QObject {
 public:
-    SForm(QObject *parent = 0L);
+    SForm(QObject *parent);
     virtual ~SForm();
 
 private:
