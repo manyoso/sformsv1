@@ -45,6 +45,7 @@ void SForm::reproduce()
     m_socket->write(block);
     m_socket->flush();
     m_socket->disconnectFromServer();
+    reproduce();
 }
 
 int main(int argc, char **argv)

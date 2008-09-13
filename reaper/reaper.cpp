@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <QDebug>
 #include <QStringList>
+#include <QSocketNotifier>
+#include <QCoreApplication>
 
 #include <signal.h>
 
@@ -13,7 +15,12 @@ Reaper::Reaper(QObject *parent)
 {
     _reaper = new QTimer(this);
     _reaper->start(1000); //every second
-    connect(_reaper, SIGNAL(timeout()), this, SLOT(reap()));
+    connect(_reaper, SIGNAL(timeout()),
+            this, SLOT(reap()));
+
+    _stdinNotifier = new QSocketNotifier(0, QSocketNotifier::Read, this);
+    connect(_stdinNotifier, SIGNAL(activated(int)),
+            this, SLOT(readStdin(int)));
 }
 
 Reaper::~Reaper()
@@ -79,3 +86,13 @@ void Reaper::logKill(const QStringList &killed)
     file.flush();
     file.close();
 }
+
+void Reaper::readStdin(int i)
+{
+    QString command;
+    QTextStream in(stdin);
+    in >> command;
+    if (command == "stop")
+        QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
+}
+

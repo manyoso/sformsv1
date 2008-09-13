@@ -13,11 +13,9 @@ public:
 
 private Q_SLOTS:
     void startReaper();
-    void pauseReaper();
     void stopReaper();
 
     void startGenesis();
-    void pauseGenesis();
     void stopGenesis();
 
 private:
@@ -25,11 +23,9 @@ private:
     QProcess *_genesis;
 
     QAction *_actionReaperStart;
-    QAction *_actionReaperPause;
     QAction *_actionReaperStop;
 
     QAction *_actionGenesisStart;
-    QAction *_actionGenesisPause;
     QAction *_actionGenesisStop;
 };
 

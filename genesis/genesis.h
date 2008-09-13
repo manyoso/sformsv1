@@ -6,6 +6,7 @@
 
 class QTime;
 class QTimer;
+class QSocketNotifier;
 
 class Genesis : public QLocalServer {
     Q_OBJECT
@@ -20,12 +21,14 @@ private Q_SLOTS:
     void diff(char *data);
     void compileAssembly(char *data);
     void spawn(const QString &file);
+    void readStdin(int);
 
 private:
     void logSpawn(const QStringList &spawn);
 
 private:
     int _blockSize;
+    QSocketNotifier *_stdinNotifier;
 };
 
 #endif

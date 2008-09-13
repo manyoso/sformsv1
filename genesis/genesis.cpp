@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QStringList>
 #include <QLibraryInfo>
+#include <QSocketNotifier>
 #include <QCoreApplication>
 
 static void crashHandler(int sig)
@@ -34,6 +35,7 @@ Genesis::Genesis(QObject *parent)
     signal(SIGILL,  crashHandler);    /* 4:   illegal instruction (not reset when caught) */
     signal(SIGTRAP, crashHandler);    /* 5:   trace trap (not reset when caught) */
     signal(SIGFPE,  crashHandler);    /* 8:   floating point exception */
+    signal(SIGKILL, crashHandler);    /* 9:   kill */
     signal(SIGBUS,  crashHandler);    /* 10:  bus error */
     signal(SIGSEGV, crashHandler);    /* 11:  segmentation violation */
     signal(SIGSYS,  crashHandler);    /* 12:  bad argument to system call */
@@ -44,6 +46,10 @@ Genesis::Genesis(QObject *parent)
 
     connect(this, SIGNAL(newConnection()),
             this, SLOT(establishConnection()));
+
+    _stdinNotifier = new QSocketNotifier(0, QSocketNotifier::Read, this);
+    connect(_stdinNotifier, SIGNAL(activated(int)),
+            this, SLOT(readStdin(int)));
 }
 
 Genesis::~Genesis()
@@ -188,4 +194,13 @@ void Genesis::logSpawn(const QStringList &spawn)
     out.flush();
     file.flush();
     file.close();
+}
+
+void Genesis::readStdin(int i)
+{
+    QString command;
+    QTextStream in(stdin);
+    in >> command;
+    if (command == "stop")
+        QTimer::singleShot(0, QCoreApplication::instance(), SLOT(quit()));
 }
