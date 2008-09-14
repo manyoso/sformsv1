@@ -16,7 +16,7 @@ Control::Control(QWidget *parent)
       _reaper(0),
       _genesis(0)
 {
-    setWindowTitle(tr("Sform Control Center"));
+    setWindowTitle(tr("SForm Control Center"));
 
     _actionStart = new QAction(tr("&Start"), this);
     connect(_actionStart, SIGNAL(triggered()), this, SLOT(start()));
