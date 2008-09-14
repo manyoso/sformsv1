@@ -13,7 +13,6 @@ private:
     void reproduce();
 
 private:
-    uint m_numChildren;
     QLocalSocket *m_socket;
 };
 

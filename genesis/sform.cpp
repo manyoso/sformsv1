@@ -3,8 +3,7 @@
 #include <iostream>
 
 SForm::SForm(QObject *parent)
-    : QObject(parent),
-    m_numChildren(0)
+    : QObject(parent)
 {
     m_socket = new QLocalSocket(this);
     reproduce();
@@ -45,7 +44,8 @@ void SForm::reproduce()
     m_socket->write(block);
     m_socket->flush();
     m_socket->disconnectFromServer();
-    reproduce();
+
+    reproduce(); //recurse
 }
 
 int main(int argc, char **argv)
