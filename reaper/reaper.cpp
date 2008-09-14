@@ -46,12 +46,15 @@ void Reaper::reap(bool killall)
             continue;
 
         qint64 pid = info[0].toLong();
-        QTime time = QTime::fromString(info[1]);
+        QTime time = QTime::fromString(info[1], "hh:mm:ss.zzz");
 
         if (killall || qAbs(time.msecsTo(QTime::currentTime())) > 1000) {
             qDebug() << "killing pid:\t" << pid;
             kill(pid, SIGKILL);
-            killed << QString::number(pid);
+            QString processInfo = QString::number(pid) +
+                                  QChar(' ') +
+                                  QTime::currentTime().toString("hh:mm:ss.zzz");
+            killed << processInfo;
         } else {
             spared << sform;
         }

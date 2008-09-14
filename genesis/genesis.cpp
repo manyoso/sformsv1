@@ -190,8 +190,12 @@ void Genesis::spawn(const QString &file)
     spawn->setEnvironment(e);
     Q_ASSERT(spawn->startDetached(spCommand, QStringList() /*args*/, QString() /*working directory*/, &pid));
 
+    QString processInfo = QString::number(pid) +
+                          QChar(' ') +
+                          QTime::currentTime().toString("hh:mm:ss.zzz") + QChar('\n');
+
     QTextStream out(&f);
-    out << QString("%1 %2\n").arg(QString::number(pid)).arg(QTime::currentTime().toString());
+    out << processInfo;
     out.flush();
     f.flush();
     f.close();
@@ -204,7 +208,7 @@ void Genesis::spawn(const QString &file)
 //     qDebug() << "remove executable:" << file;
     QFile::remove(spCommand);
 
-    logSpawn(QStringList() << QString::number(pid));
+    logSpawn(QStringList() << processInfo);
 }
 
 void Genesis::logSpawn(const QStringList &spawn)
@@ -214,7 +218,6 @@ void Genesis::logSpawn(const QStringList &spawn)
 
     QTextStream out(&file);
     out << spawn.join(QChar('\n'));
-    out << QChar('\n');
     out.flush();
     file.flush();
     file.close();
