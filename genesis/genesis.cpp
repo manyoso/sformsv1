@@ -88,13 +88,24 @@ void Genesis::readClientData()
 
     qDebug() << "readClientData";
 
-    char *data;
-    in >> data;
+    char *raw;
+    in >> raw;
+
+    QString assembly = raw;
+    QString data = assembly;
+    data.replace('\"', QString('\\') + QString('\"'));
+    data.replace('\n', QString('\\') + QString('n'));
+    QString quine = QString('q') +
+                    QString('u') +
+                    QString('i') +
+                    QString('n') +
+                    QString('e');
+    assembly.replace(quine, data);
 
 #if 1
-    compileAssembly(data);
+    compileAssembly(assembly.toLatin1().constData());
 #else
-    diff(data);
+    diff(assembly.toLatin1().constData());
 #endif
 }
 

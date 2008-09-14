@@ -37,8 +37,6 @@ void Reaper::reap(bool killall)
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
         return;
 
-    qDebug() << "reap";
-
     QStringList spared;
     QStringList killed;
     QList<QByteArray> sforms = file.readAll().split('\n');

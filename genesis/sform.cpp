@@ -27,16 +27,6 @@ void SForm::reproduce()
     QDataStream out(&block, QIODevice::WriteOnly);
 
     QString assembly = "quine";
-    QString data = assembly;
-    data.replace('\"', QString('\\') + QString('\"'));
-    data.replace('\n', QString('\\') + QString('n'));
-    QString quine = QString('q') +
-                    QString('u') +
-                    QString('i') +
-                    QString('n') +
-                    QString('e');
-    assembly.replace(quine, data);
-
     QByteArray bytes = assembly.toLatin1();
     out << bytes.size();
     out << bytes.data();
