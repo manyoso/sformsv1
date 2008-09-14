@@ -50,6 +50,8 @@ Genesis::Genesis(QObject *parent)
     _stdinNotifier = new QSocketNotifier(0, QSocketNotifier::Read, this);
     connect(_stdinNotifier, SIGNAL(activated(int)),
             this, SLOT(readStdin(int)));
+
+    compileSeed();
 }
 
 Genesis::~Genesis()
@@ -96,19 +98,16 @@ void Genesis::readClientData()
 #endif
 }
 
-void Genesis::diff(char *data)
+void Genesis::compileSeed()
 {
-    QFile file("out.s");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    QFile file("sform.s");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
-    QTextStream out(&file);
-    out << data;
-    out.flush();
-    file.flush();
+    compileAssembly(file.readAll().constData());
 }
 
-void Genesis::compileAssembly(char *data)
+void Genesis::compileAssembly(const char *data)
 {
     const uint hash = qHash(data);
     const QString objectFile = QString("%1.o").arg(hash);
@@ -145,6 +144,18 @@ void Genesis::compileAssembly(char *data)
                   QDir::separator() + objectFile);
 
     spawn(QString::number(hash));
+}
+
+void Genesis::diff(const char *data)
+{
+    QFile file("out.s");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    out << data;
+    out.flush();
+    file.flush();
 }
 
 void Genesis::spawn(const QString &file)
@@ -198,6 +209,7 @@ void Genesis::logSpawn(const QStringList &spawn)
 
 void Genesis::readStdin(int i)
 {
+    Q_UNUSED(i);
     QString command;
     QTextStream in(stdin);
     in >> command;

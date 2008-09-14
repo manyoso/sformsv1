@@ -14,7 +14,7 @@ public:
     virtual ~Reaper();
 
 private Q_SLOTS:
-    void reap();
+    void reap(bool killall = false);
     void readStdin(int);
 
 private:

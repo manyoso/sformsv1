@@ -25,9 +25,10 @@ Reaper::Reaper(QObject *parent)
 
 Reaper::~Reaper()
 {
+    reap(true); //killall
 }
 
-void Reaper::reap()
+void Reaper::reap(bool killall)
 {
     QFile file("sform-process.list");
     if (!file.exists())
@@ -49,7 +50,7 @@ void Reaper::reap()
         qint64 pid = info[0].toLong();
         QTime time = QTime::fromString(info[1]);
 
-        if (qAbs(time.msecsTo(QTime::currentTime())) > 1000) {
+        if (killall || qAbs(time.msecsTo(QTime::currentTime())) > 1000) {
             qDebug() << "killing process:" << pid;
             kill(pid, SIGKILL);
             killed << QString::number(pid);
@@ -89,6 +90,7 @@ void Reaper::logKill(const QStringList &killed)
 
 void Reaper::readStdin(int i)
 {
+    Q_UNUSED(i);
     QString command;
     QTextStream in(stdin);
     in >> command;

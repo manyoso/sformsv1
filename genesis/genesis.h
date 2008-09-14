@@ -18,8 +18,9 @@ private Q_SLOTS:
     void establishConnection();
     void readClientData();
 
-    void diff(char *data);
-    void compileAssembly(char *data);
+    void compileSeed();
+    void compileAssembly(const char *data);
+    void diff(const char *data);
     void spawn(const QString &file);
     void readStdin(int);
 
