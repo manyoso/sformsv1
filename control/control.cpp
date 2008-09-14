@@ -70,7 +70,7 @@ void Control::startReaper()
     if (_reaper)
         return;
 
-    qDebug() << "startReaper";
+//     qDebug() << "startReaper";
     QString command = QCoreApplication::applicationDirPath() +
                       QDir::separator() + QLatin1String("reaper");
     _reaper = new QProcess(this);
@@ -97,7 +97,7 @@ void Control::stopReaper()
         }
     }
 
-    qDebug() << "stopReaper";
+//     qDebug() << "stopReaper";
     _reaper->write("stop");
     _reaper->closeWriteChannel();
     _reaper->waitForFinished(2000); //give it a chance to exit gracefully
@@ -124,7 +124,7 @@ void Control::startGenesis()
         }
     }
 
-    qDebug() << "startGenesis";
+//     qDebug() << "startGenesis";
     QString command = QCoreApplication::applicationDirPath() +
                       QDir::separator() + QLatin1String("genesis");
     _genesis = new QProcess(this);
@@ -138,7 +138,7 @@ void Control::stopGenesis()
     if (!_genesis)
         return;
 
-    qDebug() << "stopGenesis";
+//     qDebug() << "stopGenesis";
     _genesis->write("stop");
     _genesis->closeWriteChannel();
     _genesis->waitForFinished(2000); //give it a chance to exit gracefully

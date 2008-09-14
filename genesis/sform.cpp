@@ -18,10 +18,12 @@ void SForm::reproduce()
     m_socket->abort();
     m_socket->connectToServer(QLatin1String("sform"));
     if (!m_socket->waitForConnected(-1)) {
-        qDebug() << "Connection to sform server failed:" << m_socket->error();
         ::sleep(1);
         reproduce();
     }
+
+    qint64 pid = QCoreApplication::applicationPid();
+    qDebug() << "reproduce pid:\t" << pid;
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -30,7 +32,7 @@ void SForm::reproduce()
     QByteArray bytes = assembly.toLatin1();
     out << bytes.size();
     out << bytes.data();
-
+    out << QCoreApplication::applicationPid();
     m_socket->write(block);
     m_socket->flush();
     m_socket->disconnectFromServer();

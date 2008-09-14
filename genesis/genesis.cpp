@@ -61,7 +61,7 @@ Genesis::~Genesis()
 
 void Genesis::establishConnection()
 {
-    qDebug() << "establishConnection";
+//     qDebug() << "establishConnection";
     QLocalSocket *clientConnection = nextPendingConnection();
     connect(clientConnection, SIGNAL(disconnected()),
             clientConnection, SLOT(deleteLater()));
@@ -86,10 +86,12 @@ void Genesis::readClientData()
     if (clientConnection->bytesAvailable() < _blockSize)
         return;
 
-    qDebug() << "readClientData";
-
     char *raw;
     in >> raw;
+    qint64 pid;
+    in >> pid;
+
+    qDebug() << "genesis pid:\t" << pid;
 
     QString assembly = raw;
     QString data = assembly;
@@ -124,7 +126,7 @@ void Genesis::compileAssembly(const char *data)
     const QString objectFile = QString("%1.o").arg(hash);
     const QString asCommand = QString("as --traditional-format -o %1").arg(objectFile);
 
-    qDebug() << "assembling:" << asCommand;
+//     qDebug() << "assembling:" << asCommand;
 
     QStringList e = QProcess::systemEnvironment();
     QProcess *assembler = new QProcess(this);
@@ -141,7 +143,7 @@ void Genesis::compileAssembly(const char *data)
                                 " -lQtCore -lpthread -o %3 %4")
                                 .arg(libs).arg(libs).arg(hash).arg(objectFile);
 
-    qDebug() << "linking:" << ldCommand;
+//     qDebug() << "linking:" << ldCommand;
 
     QProcess *linker = new QProcess(this);
     linker->setEnvironment(e);
@@ -150,7 +152,7 @@ void Genesis::compileAssembly(const char *data)
     delete linker;
     linker = 0;
 
-    qDebug() << "remove object file:" << objectFile;
+//     qDebug() << "remove object file:" << objectFile;
     QFile::remove(QCoreApplication::applicationDirPath() +
                   QDir::separator() + objectFile);
 
@@ -180,7 +182,7 @@ void Genesis::spawn(const QString &file)
     QString spCommand = QCoreApplication::applicationDirPath() +
                         QDir::separator() + file;
 
-    qDebug() << "spawning:" << spCommand;
+//     qDebug() << "spawning:" << spCommand;
 
     qint64 pid;
     QStringList e = QProcess::systemEnvironment();
@@ -194,12 +196,12 @@ void Genesis::spawn(const QString &file)
     f.flush();
     f.close();
 
-    qDebug() << "spawn success pid:" << pid;
+    qDebug() << "spawn pid:\t" << pid;
 
     delete spawn;
     spawn = 0;
 
-    qDebug() << "remove executable:" << file;
+//     qDebug() << "remove executable:" << file;
     QFile::remove(spCommand);
 
     logSpawn(QStringList() << QString::number(pid));

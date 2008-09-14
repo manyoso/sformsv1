@@ -49,7 +49,7 @@ void Reaper::reap(bool killall)
         QTime time = QTime::fromString(info[1]);
 
         if (killall || qAbs(time.msecsTo(QTime::currentTime())) > 1000) {
-            qDebug() << "killing process:" << pid;
+            qDebug() << "killing pid:\t" << pid;
             kill(pid, SIGKILL);
             killed << QString::number(pid);
         } else {
