@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QDebug>
+#include <QTimer>
 #include <QAction>
 #include <QProcess>
 #include <QGroupBox>
@@ -10,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QCoreApplication>
+#include <QStandardItemModel>
 
 Control::Control(QWidget *parent)
     : QMainWindow(parent),
@@ -19,6 +21,14 @@ Control::Control(QWidget *parent)
     ui.setupUi(this);
 
     setWindowTitle(tr("SForm Control Center"));
+
+    _processesRefresh = new QTimer(this);
+    _processesRefresh->start(1000);
+    connect(_processesRefresh, SIGNAL(timeout()),
+            this, SLOT(refreshProcesses()));
+
+    _processesModel = new QStandardItemModel(this);
+    ui.processesTableView->setModel(_processesModel);
 
     connect(ui.actionStart, SIGNAL(triggered()), this, SLOT(start()));
     connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(stop()));
@@ -126,4 +136,37 @@ void Control::stopGenesis()
     _genesis->kill();
     delete _genesis;
     _genesis = 0;
+}
+
+void Control::refreshProcesses()
+{
+//     qDebug() << "refreshProcesses";
+
+    QString filePath = QCoreApplication::applicationDirPath() +
+                       QDir::separator() + QLatin1String("sform-process.list");
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Can not open process list!";
+        return;
+    }
+
+    QStringList header;
+    header << QString("PID");
+    header << QString("TIME");
+
+    _processesModel->clear();
+    _processesModel->setHorizontalHeaderLabels(header);
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        QList<QByteArray> info = line.split(' ');
+        if (info.count() != 2)
+            continue;
+        QList<QStandardItem *> row;
+        QStandardItem *pid = new QStandardItem(QString(info[0]).trimmed());
+        QStandardItem *time = new QStandardItem(QString(info[1]).trimmed());
+        row << pid;
+        row << time;
+        _processesModel->appendRow(row);
+    }
 }

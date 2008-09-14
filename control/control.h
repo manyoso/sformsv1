@@ -5,7 +5,9 @@
 
 #include "ui_control.h"
 
+class QTimer;
 class QProcess;
+class QStandardItemModel;
 
 class Control : public QMainWindow {
     Q_OBJECT
@@ -24,7 +26,11 @@ private Q_SLOTS:
     void startGenesis();
     void stopGenesis();
 
+    void refreshProcesses();
+
 private:
+    QTimer *_processesRefresh;
+    QStandardItemModel *_processesModel;
     QProcess *_reaper;
     QProcess *_genesis;
     Ui::Control ui;

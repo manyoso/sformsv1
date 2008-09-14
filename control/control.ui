@@ -24,7 +24,7 @@
    <layout class="QHBoxLayout" name="horizontalLayout" >
     <item>
      <widget class="QTabWidget" name="tabWidget" >
-      <widget class="QWidget" name="sformProcessesTab" >
+      <widget class="QWidget" name="processesTab" >
        <property name="geometry" >
         <rect>
          <x>0</x>
@@ -34,11 +34,11 @@
         </rect>
        </property>
        <attribute name="title" >
-        <string>SForm Processes</string>
+        <string>Processes</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2" >
         <item>
-         <widget class="QListView" name="_sformProcessesListView" />
+         <widget class="QTableView" name="processesTableView" />
         </item>
        </layout>
       </widget>
@@ -55,14 +55,6 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>File</string>
-    </property>
-    <addaction name="actionStart" />
-    <addaction name="actionStop" />
-   </widget>
-   <addaction name="menuFile" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
