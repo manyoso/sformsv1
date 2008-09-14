@@ -18,58 +18,52 @@ Control::Control(QWidget *parent)
 {
     setWindowTitle(tr("Sform Control Center"));
 
-    _actionReaperStart = new QAction(tr("&Start"), this);
-    connect(_actionReaperStart, SIGNAL(triggered()), this, SLOT(startReaper()));
+    _actionStart = new QAction(tr("&Start"), this);
+    connect(_actionStart, SIGNAL(triggered()), this, SLOT(start()));
 
-    _actionReaperStop = new QAction(tr("&Stop"), this);
-    _actionReaperStop->setEnabled(false);
-    connect(_actionReaperStop, SIGNAL(triggered()), this, SLOT(stopReaper()));
-
-    _actionGenesisStart = new QAction(tr("&Start"), this);
-    connect(_actionGenesisStart, SIGNAL(triggered()), this, SLOT(startGenesis()));
-
-    _actionGenesisStop = new QAction(tr("&Stop"), this);
-    _actionGenesisStop->setEnabled(false);
-    connect(_actionGenesisStop, SIGNAL(triggered()), this, SLOT(stopGenesis()));
+    _actionStop = new QAction(tr("&Stop"), this);
+    _actionStop->setEnabled(false);
+    connect(_actionStop, SIGNAL(triggered()), this, SLOT(stop()));
 
     QWidget *centralWidget = new QWidget(this);
 
-    QGroupBox *reaperWidget = new QGroupBox(tr("Reaper Controls"), centralWidget);
+    QGroupBox *controlWidget = new QGroupBox(tr("SForm Controls"), centralWidget);
 
-    QToolButton *reaperStart = new QToolButton(reaperWidget);
-    reaperStart->setDefaultAction(_actionReaperStart);
-    QToolButton *reaperStop = new QToolButton(reaperWidget);
-    reaperStop->setDefaultAction(_actionReaperStop);
+    QToolButton *start = new QToolButton(controlWidget);
+    start->setDefaultAction(_actionStart);
+    QToolButton *stop = new QToolButton(controlWidget);
+    stop->setDefaultAction(_actionStop);
 
-    QHBoxLayout *reaperLayout = new QHBoxLayout(reaperWidget);
-    reaperLayout->addWidget(reaperStart);
-    reaperLayout->addWidget(reaperStop);
-    reaperWidget->setLayout(reaperLayout);
-
-    QGroupBox *genesisWidget = new QGroupBox(tr("Genesis Controls"), centralWidget);
-
-    QToolButton *genesisStart = new QToolButton(genesisWidget);
-    genesisStart->setDefaultAction(_actionGenesisStart);
-    QToolButton *genesisStop = new QToolButton(genesisWidget);
-    genesisStop->setDefaultAction(_actionGenesisStop);
-
-    QHBoxLayout *genesisLayout = new QHBoxLayout(genesisWidget);
-    genesisLayout->addWidget(genesisStart);
-    genesisLayout->addWidget(genesisStop);
-    genesisWidget->setLayout(genesisLayout);
+    QHBoxLayout *controlLayout = new QHBoxLayout(controlWidget);
+    controlLayout->addWidget(start);
+    controlLayout->addWidget(stop);
+    controlWidget->setLayout(controlLayout);
 
     QHBoxLayout *centralLayout = new QHBoxLayout(centralWidget);
-    centralLayout->addWidget(reaperWidget);
-    centralLayout->addWidget(genesisWidget);
+    centralLayout->addWidget(controlWidget);
     centralWidget->setLayout(centralLayout);
     setCentralWidget(centralWidget);
 }
 
 Control::~Control()
 {
-    stopReaper();
-    stopGenesis();
+    stop();
 }
+
+void Control::start()
+{
+    startReaper();
+    startGenesis();
+    _actionStart->setEnabled(false);
+    _actionStop->setEnabled(true);
+}
+
+void Control::stop()
+{
+    stopGenesis();
+    stopReaper();
+    _actionStart->setEnabled(true);
+    _actionStop->setEnabled(false);}
 
 void Control::startReaper()
 {
@@ -83,9 +77,6 @@ void Control::startReaper()
     _reaper->setWorkingDirectory(QCoreApplication::applicationDirPath());
     _reaper->setProcessChannelMode(QProcess::ForwardedChannels);
     _reaper->start(command);
-
-    _actionReaperStart->setEnabled(false);
-    _actionReaperStop->setEnabled(true);
 }
 
 void Control::stopReaper()
@@ -113,9 +104,6 @@ void Control::stopReaper()
     _reaper->kill();
     delete _reaper;
     _reaper = 0;
-
-    _actionReaperStart->setEnabled(true);
-    _actionReaperStop->setEnabled(false);
 }
 
 void Control::startGenesis()
@@ -143,9 +131,6 @@ void Control::startGenesis()
     _genesis->setWorkingDirectory(QCoreApplication::applicationDirPath());
     _genesis->setProcessChannelMode(QProcess::ForwardedChannels);
     _genesis->start(command);
-
-    _actionGenesisStart->setEnabled(false);
-    _actionGenesisStop->setEnabled(true);
 }
 
 void Control::stopGenesis()
@@ -160,7 +145,4 @@ void Control::stopGenesis()
     _genesis->kill();
     delete _genesis;
     _genesis = 0;
-
-    _actionGenesisStart->setEnabled(true);
-    _actionGenesisStop->setEnabled(false);
 }

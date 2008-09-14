@@ -11,6 +11,10 @@ public:
     Control(QWidget *parent = 0L);
     virtual ~Control();
 
+public Q_SLOTS:
+    void start();
+    void stop();
+
 private Q_SLOTS:
     void startReaper();
     void stopReaper();
@@ -22,11 +26,8 @@ private:
     QProcess *_reaper;
     QProcess *_genesis;
 
-    QAction *_actionReaperStart;
-    QAction *_actionReaperStop;
-
-    QAction *_actionGenesisStart;
-    QAction *_actionGenesisStop;
+    QAction *_actionStart;
+    QAction *_actionStop;
 };
 
 #endif
