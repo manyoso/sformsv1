@@ -3,6 +3,7 @@ include($$PWD/../sforms.pri)
 HEADERS += control.h
 SOURCES += main.cpp \
            control.cpp
+FORMS += control.ui
 
 DESTDIR = $$OUTPUT_DIR/bin
 

@@ -16,33 +16,13 @@ Control::Control(QWidget *parent)
       _reaper(0),
       _genesis(0)
 {
+    ui.setupUi(this);
+
     setWindowTitle(tr("SForm Control Center"));
 
-    _actionStart = new QAction(tr("&Start"), this);
-    connect(_actionStart, SIGNAL(triggered()), this, SLOT(start()));
-
-    _actionStop = new QAction(tr("&Stop"), this);
-    _actionStop->setEnabled(false);
-    connect(_actionStop, SIGNAL(triggered()), this, SLOT(stop()));
-
-    QWidget *centralWidget = new QWidget(this);
-
-    QGroupBox *controlWidget = new QGroupBox(tr("SForm Controls"), centralWidget);
-
-    QToolButton *start = new QToolButton(controlWidget);
-    start->setDefaultAction(_actionStart);
-    QToolButton *stop = new QToolButton(controlWidget);
-    stop->setDefaultAction(_actionStop);
-
-    QHBoxLayout *controlLayout = new QHBoxLayout(controlWidget);
-    controlLayout->addWidget(start);
-    controlLayout->addWidget(stop);
-    controlWidget->setLayout(controlLayout);
-
-    QHBoxLayout *centralLayout = new QHBoxLayout(centralWidget);
-    centralLayout->addWidget(controlWidget);
-    centralWidget->setLayout(centralLayout);
-    setCentralWidget(centralWidget);
+    connect(ui.actionStart, SIGNAL(triggered()), this, SLOT(start()));
+    connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(stop()));
+    ui.actionStop->setEnabled(false);
 }
 
 Control::~Control()
@@ -54,16 +34,17 @@ void Control::start()
 {
     startReaper();
     startGenesis();
-    _actionStart->setEnabled(false);
-    _actionStop->setEnabled(true);
+    ui.actionStart->setEnabled(false);
+    ui.actionStop->setEnabled(true);
 }
 
 void Control::stop()
 {
     stopGenesis();
     stopReaper();
-    _actionStart->setEnabled(true);
-    _actionStop->setEnabled(false);}
+    ui.actionStart->setEnabled(true);
+    ui.actionStop->setEnabled(false);
+}
 
 void Control::startReaper()
 {

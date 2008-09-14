@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "ui_control.h"
+
 class QProcess;
 
 class Control : public QMainWindow {
@@ -25,9 +27,7 @@ private Q_SLOTS:
 private:
     QProcess *_reaper;
     QProcess *_genesis;
-
-    QAction *_actionStart;
-    QAction *_actionStop;
+    Ui::Control ui;
 };
 
 #endif
