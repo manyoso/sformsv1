@@ -37,6 +37,7 @@ void SForm::reproduce()
     m_socket->flush();
     m_socket->disconnectFromServer();
 
+    ::sleep(1);
     reproduce(); //recurse
 }
 
