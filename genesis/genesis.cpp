@@ -105,9 +105,9 @@ void Genesis::readClientData()
     assembly.replace(quine, data);
 
 #if 1
-    compileAssembly(assembly.toLatin1().constData());
+    compileAssembly(assembly.toLatin1().constData(), pid);
 #else
-    diff(assembly.toLatin1().constData());
+    diff(assembly.toLatin1().constData(), pid);
 #endif
 }
 
@@ -117,10 +117,10 @@ void Genesis::compileSeed()
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
-    compileAssembly(file.readAll().constData());
+    compileAssembly(file.readAll().constData(), -1);
 }
 
-void Genesis::compileAssembly(const char *data)
+void Genesis::compileAssembly(const char *data, qint64 parent)
 {
     const uint hash = qHash(data);
     const QString objectFile = QString("%1.o").arg(hash);
@@ -156,11 +156,12 @@ void Genesis::compileAssembly(const char *data)
     QFile::remove(QCoreApplication::applicationDirPath() +
                   QDir::separator() + objectFile);
 
-    spawn(QString::number(hash));
+    spawn(QString::number(hash), parent);
 }
 
-void Genesis::diff(const char *data)
+void Genesis::diff(const char *data, qint64 parent)
 {
+    Q_UNUSED(parent);
     QFile file("out.s");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
@@ -171,7 +172,7 @@ void Genesis::diff(const char *data)
     file.flush();
 }
 
-void Genesis::spawn(const QString &file)
+void Genesis::spawn(const QString &file, qint64 parent)
 {
     QFile f("sform-process.list");
     if (!f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
@@ -190,6 +191,8 @@ void Genesis::spawn(const QString &file)
     spawn->setEnvironment(e);
     Q_ASSERT(spawn->startDetached(spCommand, QStringList() /*args*/, QString() /*working directory*/, &pid));
 
+    qDebug() << "spawn pid:\t" << pid;
+
     QString processInfo = QString::number(pid) +
                           QChar(' ') +
                           QTime::currentTime().toString("hh:mm:ss.zzz") + QChar('\n');
@@ -200,15 +203,27 @@ void Genesis::spawn(const QString &file)
     f.flush();
     f.close();
 
-    qDebug() << "spawn pid:\t" << pid;
-
     delete spawn;
     spawn = 0;
 
 //     qDebug() << "remove executable:" << file;
     QFile::remove(spCommand);
 
+    logTree(parent, pid);
     logSpawn(QStringList() << processInfo);
+}
+
+void Genesis::logTree(qint64 parent, qint64 child)
+{
+    QFile file("sform-tree.list");
+    Q_ASSERT(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text));
+
+    QTextStream out(&file);
+    out << QString::number(parent) << QLatin1String(" ")
+        << QString::number(child) << QLatin1String("\n");
+    out.flush();
+    file.flush();
+    file.close();
 }
 
 void Genesis::logSpawn(const QStringList &spawn)

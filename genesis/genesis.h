@@ -19,12 +19,13 @@ private Q_SLOTS:
     void readClientData();
 
     void compileSeed();
-    void compileAssembly(const char *data);
-    void diff(const char *data);
-    void spawn(const QString &file);
+    void compileAssembly(const char *data, qint64 parent);
+    void diff(const char *data, qint64 parent);
+    void spawn(const QString &file, qint64 parent);
     void readStdin(int);
 
 private:
+    void logTree(qint64 parent, qint64 child);
     void logSpawn(const QStringList &spawn);
 
 private:
