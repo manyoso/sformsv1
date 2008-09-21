@@ -6,7 +6,8 @@
 
 QT += core
 
-;CONFIG += silent
+CONFIG += silent
+CONFIG += console
 
 TOPLEVELDIR = $$PWD
 
@@ -17,3 +18,5 @@ INCLUDEPATH += $$TOPLEVELDIR
 LIBS += -L$$OUTPUT_DIR/lib
 
 QMAKE_RPATHDIR += $$OUTPUT_DIR/lib
+
+QMAKE_CXXFLAGS += -Werror
