@@ -554,7 +554,7 @@ protected:
     unsigned align;
 
 public:
-    void init( bool do_annotations, bool do_gprof, bool do_gcov, bool m32)
+    void init( bool do_annotations, bool do_gprof, bool do_gcov)
     {
         // We need a class init method because C++ constructors are useless.
         pad = 0;
@@ -570,20 +570,6 @@ public:
 	datastr = ".long";
 	section = ".afterburn";
 	align = 4;
-#endif
-#if defined (ARCH_amd64)
-	if (m32)
-	{
-	    datastr = ".long";
-	    section = ".afterburn32";
-	    align = 4;
-	}
-	else
-	{
-	    datastr = ".quad";
-	    section = ".afterburn";
-	    align = 8;
-	}
 #endif
     }
 
@@ -614,7 +600,7 @@ protected:
 	std::cout << s->getText();
     }
 
-    void endSensitive( antlr::RefAST s )
+    void endSensitive( antlr::RefAST )
     {
         if( !annotate_sensitive )
 	    return;

@@ -32,9 +32,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "generated/AsmLexer.hpp"
-#include "generated/AsmParser.hpp"
-#include "generated/AsmTreeParser.hpp"
+#include "AsmLexer.hpp"
+#include "AsmParser.hpp"
+#include "AsmTreeParser.hpp"
 #include <antlr/TokenBuffer.hpp>
 
 int main( int argc, char *argv[] )
@@ -46,7 +46,6 @@ int main( int argc, char *argv[] )
     bool burn_gprof = false;
     bool burn_gcov = false;
     bool burn_sensitive = true;
-    bool burn_32 = false;
     char *filename = NULL;
 
     for( int i = 1; i < argc; i++ ) {
@@ -56,10 +55,6 @@ int main( int argc, char *argv[] )
             burn_gcov = true;
         else if( !strcmp(argv[i], "-s") )
             burn_sensitive = false;
-        else if( !strcmp(argv[i], "-m32") )
-            burn_32 = true;
-        else if( !strcmp(argv[i], "-m64") )
-            burn_32 = false;
         else
             filename = argv[i];
     }
@@ -81,7 +76,7 @@ int main( int argc, char *argv[] )
         RefAST a = parser.getAST();
 
         AsmTreeParser tree_parser;
-        tree_parser.init( burn_sensitive, burn_gprof, burn_gcov, burn_32 );
+        tree_parser.init( burn_sensitive, burn_gprof, burn_gcov );
         tree_parser.initializeASTFactory( ast_factory );
         tree_parser.setASTFactory( &ast_factory );
 

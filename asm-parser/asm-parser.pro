@@ -10,10 +10,10 @@ TARGET = asm-parser
 LIBS    += /usr/lib/libantlr.a
 
 #global defaults
-isEmpty(ANTLR_DIR):ANTLR_DIR = generated
+isEmpty(ANTLR_DIR):ANTLR_DIR = .
 isEmpty(ANTLR_CMD):ANTLR_CMD = runantlr
 
-ANTLR_GRAMMAR = Asm.g
+ANTLR_GRAMMAR = $$TOPLEVELDIR/asm-parser/Asm.g
 ANTLR_GRAMMAR_I = $$ANTLR_DIR/Asm.g.i
 
 ######################  PREPROCESS FILES  ######################

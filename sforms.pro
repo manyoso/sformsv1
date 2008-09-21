@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 CONFIG += ordered silent
-SUBDIRS = asm-quine genesis reaper control
+SUBDIRS = asm-parser asm-quine genesis reaper control
