@@ -22,13 +22,15 @@ Control::Control(QWidget *parent)
 
     setWindowTitle(tr("SForm Control Center"));
 
-    _processesRefresh = new QTimer(this);
-    _processesRefresh->start(1000);
-    connect(_processesRefresh, SIGNAL(timeout()),
-            this, SLOT(refreshProcesses()));
+    _modelRefresh = new QTimer(this);
+    connect(_modelRefresh, SIGNAL(timeout()),
+            this, SLOT(refreshModels()));
 
     _processesModel = new QStandardItemModel(this);
     ui.processesTableView->setModel(_processesModel);
+
+    _inheritanceModel = new QStandardItemModel(this);
+    ui.inheritanceTreeView->setModel(_inheritanceModel);
 
     connect(ui.actionStart, SIGNAL(triggered()), this, SLOT(start()));
     connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(stop()));
@@ -46,6 +48,7 @@ void Control::start()
     startGenesis();
     ui.actionStart->setEnabled(false);
     ui.actionStop->setEnabled(true);
+    _modelRefresh->start(1000);
 }
 
 void Control::stop()
@@ -54,6 +57,7 @@ void Control::stop()
     stopReaper();
     ui.actionStart->setEnabled(true);
     ui.actionStop->setEnabled(false);
+    _modelRefresh->stop();
 }
 
 void Control::startReaper()
@@ -138,10 +142,14 @@ void Control::stopGenesis()
     _genesis = 0;
 }
 
-void Control::refreshProcesses()
+void Control::refreshModels()
 {
-//     qDebug() << "refreshProcesses";
+    refreshProcessesModel();
+    refreshInheritanceModel();
+}
 
+void Control::refreshProcessesModel()
+{
     QString filePath = QCoreApplication::applicationDirPath() +
                        QDir::separator() + QLatin1String("sform-process.list");
     QFile file(filePath);
@@ -168,5 +176,40 @@ void Control::refreshProcesses()
         row << pid;
         row << time;
         _processesModel->appendRow(row);
+    }
+}
+
+void Control::refreshInheritanceModel()
+{
+    QString filePath = QCoreApplication::applicationDirPath() +
+                       QDir::separator() + QLatin1String("sform-tree.list");
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Can not open tree list!";
+        return;
+    }
+
+    _inheritanceModel->clear();
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        QList<QByteArray> info = line.split(' ');
+        if (info.count() != 2)
+            continue;
+
+        QString parentPid = info[0].trimmed();
+        QString childPid = info[1].trimmed();
+
+        QStandardItem *parent = 0;
+        if (parentPid.toInt() == -1) {
+            parent = _inheritanceModel->invisibleRootItem();
+        } else {
+            QList<QStandardItem*> items = _inheritanceModel->findItems(parentPid, Qt::MatchExactly | Qt::MatchRecursive);
+            if (!items.isEmpty())
+                parent = items.first();
+        }
+
+        if (parent)
+            parent->appendRow(new QStandardItem(childPid));
     }
 }

@@ -26,11 +26,14 @@ private Q_SLOTS:
     void startGenesis();
     void stopGenesis();
 
-    void refreshProcesses();
+    void refreshModels();
+    void refreshProcessesModel();
+    void refreshInheritanceModel();
 
 private:
-    QTimer *_processesRefresh;
+    QTimer *_modelRefresh;
     QStandardItemModel *_processesModel;
+    QStandardItemModel *_inheritanceModel;
     QProcess *_reaper;
     QProcess *_genesis;
     Ui::Control ui;
