@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2006,  University of Karlsruhe
  *
- * File path:     asm-parser/afterburner.cpp
+ * File path:     asm-parser/main.cpp
  * Description:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
  * SUCH DAMAGE.
  *
  ********************************************************************/
-
 
 #include <iostream>
 #include <fstream>
@@ -101,4 +100,3 @@ int main( int argc, char *argv[] )
     }
     return 0;
 }
-

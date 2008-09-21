@@ -1,6 +1,6 @@
 include($$PWD/../sforms.pri)
 
-SOURCES = afterburner.cpp
+SOURCES = main.cpp
 
 DESTDIR = $$OUTPUT_DIR/bin
 
