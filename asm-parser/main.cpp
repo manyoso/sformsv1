@@ -36,65 +36,49 @@
 #include "AsmTreeParser.hpp"
 #include <antlr/TokenBuffer.hpp>
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
+    if (argc < 1)
+        return 0;
+
     ANTLR_USING_NAMESPACE(std);
     ANTLR_USING_NAMESPACE(antlr);
     ANTLR_USING_NAMESPACE(Asm);
 
-    bool burn_gprof = false;
-    bool burn_gcov = false;
-    bool burn_sensitive = true;
-    char *filename = NULL;
+    char *filename = argv[1];
 
-    for( int i = 1; i < argc; i++ ) {
-        if( !strcmp(argv[i], "-p") )
-            burn_gprof = true;
-        else if( !strcmp(argv[i], "-c") )
-            burn_gcov = true;
-        else if( !strcmp(argv[i], "-s") )
-            burn_sensitive = false;
-        else
-            filename = argv[i];
-    }
-
-    if( NULL == filename )
-        exit( 1 );
+    if (!filename)
+        exit(1);
 
     try {
-        ifstream input( filename );
+        ifstream input(filename);
         AsmLexer lexer(input);
         TokenBuffer buffer(lexer);
         AsmParser parser(buffer);
 
         ASTFactory ast_factory;
-        parser.initializeASTFactory( ast_factory );
-        parser.setASTFactory( &ast_factory );
+        parser.initializeASTFactory(ast_factory);
+        parser.setASTFactory(&ast_factory);
 
         parser.asmFile();
         RefAST a = parser.getAST();
 
         AsmTreeParser tree_parser;
-        tree_parser.init( burn_sensitive, burn_gprof, burn_gcov );
-        tree_parser.initializeASTFactory( ast_factory );
-        tree_parser.setASTFactory( &ast_factory );
+        tree_parser.init(false, false, false);
+        tree_parser.initializeASTFactory(ast_factory);
+        tree_parser.setASTFactory(&ast_factory);
 
-        tree_parser.asmFile( a );
-
+        tree_parser.asmFile(a);
 #if 0
         cout << "List:" << endl;
         cout << a->toStringList() << endl;
         cout << "Tree:" << endl;
         cout << a->toStringTree() << endl;
 #endif
-    }
-    catch( ANTLRException& e )
-    {
+    } catch (ANTLRException& e) {
         cerr << "exception: " << e.getMessage() << endl;
         return 2;
-    }
-    catch( exception& e )
-    {
+    } catch (exception& e) {
         cerr << "exception: " << e.what() << endl;
         return 3;
     }
