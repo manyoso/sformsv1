@@ -19,4 +19,4 @@ LIBS += -L$$OUTPUT_DIR/lib
 
 QMAKE_RPATHDIR += $$OUTPUT_DIR/lib
 
-QMAKE_CXXFLAGS += -Werror
+#QMAKE_CXXFLAGS += -Werror
