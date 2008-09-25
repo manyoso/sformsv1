@@ -68,22 +68,41 @@ int lcs_lengthLines(const QByteArray &a, const QByteArray &b)
 
     const int length = l.value(0, 0);
 
+    QList<QByteArray> diff;
     QList<QByteArray> longestSubSequence;
     int i = 0;
     int j = 0;
     while (i < aSize && j < bSize) {
         if (aLines.at(i) == bLines.at(j)) {
+//             qDebug() << "equal line" << aLines.at(i);
             longestSubSequence.append(aLines.at(i));
+            diff.append(aLines.at(i));
             i++; j++;
         } else if (l.value(i+1, j) >= l.value(i, j+1)) {
+//             qDebug() << "else if"
+//                      << "\na line" << aLines.at(i)
+//                      << "\nb line" << bLines.at(j);
+
+            diff.append("-" + aLines.at(i));
+
             i++;
         } else {
+//             qDebug() << "else"
+//                      << "\na line" << aLines.at(i)
+//                      << "\nb line" << bLines.at(j);
+
+            diff.append("+" + bLines.at(j));
+
             j++;
         }
     }
 
-    qDebug() << "longestSubSequence";
-    foreach (QByteArray line, longestSubSequence) {
+//     qDebug() << "longestSubSequence";
+//     foreach (QByteArray line, longestSubSequence) {
+//         qDebug() << line;
+//     }
+
+    foreach (QByteArray line, diff) {
         qDebug() << line;
     }
 
