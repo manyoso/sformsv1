@@ -140,19 +140,14 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
     int minusRange = 0;
     int plusStart = 0;
     int plusRange = 0;
-    bool newHunk = false;
     bool firstMinus = false;
     bool firstPlus = false;
-    for (int i = 0; i < lines.count(); ++i) {
+    for (int i = 1; i < lines.count(); ++i) {
         DiffLine line = lines.at(i);
 
         switch (line.type)
         {
         case DiffLine::Hunk:
-            if (!newHunk) {
-                newHunk = true;
-                continue;
-            }
             HunkRange range;
             range.minusL = minusStart + 1;
             range.minusS = minusRange;
@@ -163,7 +158,6 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
             minusRange = 0;
             plusStart = 0;
             plusRange = 0;
-            newHunk = true;
             firstMinus = true;
             firstPlus = true;
             break;
