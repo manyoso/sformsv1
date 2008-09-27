@@ -79,8 +79,6 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
         }
     }
 
-    //l.print();
-
     QList<DiffLine> lines;
     int i = 0;
     int j = 0;
