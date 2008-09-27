@@ -192,11 +192,7 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
             line.line = hunk.toLatin1();
         }
 
-/*        qDebug() << line.type
-                 << line.indexA
-                 << line.indexB
-                 << line.line;*/
-        diff.append(line.line + "\n");
+        diff.append(line.line + '\n');
     }
 
     return diff;
