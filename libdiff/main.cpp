@@ -67,14 +67,14 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
     const int aSize = aLines.size();
     const int bSize = bLines.size();
 
-    LCSLengths l(aSize, bSize);
+    LCSLengths lengths(aSize, bSize);
 
     for (int i = aSize - 1; i >= 0; i--) {
         for (int j = bSize - 1; j >= 0; j--) {
             if (aLines.at(i) == bLines.at(j)) {
-                l.setValue(i, j, 1 + l.value(i+1, j+1));
+                lengths.setValue(i, j, 1 + lengths.value(i+1, j+1));
             } else {
-                l.setValue(i, j, qMax(l.value(i+1, j), l.value(i, j+1)));
+                lengths.setValue(i, j, qMax(lengths.value(i+1, j), lengths.value(i, j+1)));
             }
         }
     }
@@ -94,7 +94,7 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
             line.indexB = j;
             line.line = " " + a;
             i++; j++;
-        } else if (!exhaustedA && l.value(i+1, j) >= l.value(i, j+1)) {
+        } else if (!exhaustedA && lengths.value(i+1, j) >= lengths.value(i, j+1)) {
             line.type = DiffLine::Minus;
             line.indexA = i;
             line.indexB = -1;
