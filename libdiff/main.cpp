@@ -140,8 +140,6 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
     int minusRange = 0;
     int plusStart = 0;
     int plusRange = 0;
-    bool firstMinus = false;
-    bool firstPlus = false;
     for (int i = 1; i < lines.count(); ++i) {
         DiffLine line = lines.at(i);
 
@@ -149,43 +147,29 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
         {
         case DiffLine::Hunk:
             HunkRange range;
-            range.minusL = minusStart + 1;
+            range.minusL = minusStart;
             range.minusS = minusRange;
-            range.plusL = plusStart + 1;
+            range.plusL = plusStart;
             range.plusS = plusRange;
             ranges << range;
             minusStart = 0;
             minusRange = 0;
             plusStart = 0;
             plusRange = 0;
-            firstMinus = true;
-            firstPlus = true;
             break;
         case DiffLine::Context:
             plusRange++;
             minusRange++;
-            if (firstMinus) {
-                minusStart = line.indexA;
-                firstMinus = false;
-            }
-            if (firstPlus) {
-                plusStart = line.indexB;
-                firstPlus = false;
-            }
+            if (!minusStart) minusStart = line.indexA + 1;
+            if (!plusStart) plusStart = line.indexB + 1;
             break;
         case DiffLine::Minus:
             minusRange++;
-            if (firstMinus) {
-                minusStart = line.indexA;
-                firstMinus = false;
-            }
+            if (!minusStart) minusStart = line.indexA + 1;
             break;
         case DiffLine::Plus:
             plusRange++;
-            if (firstPlus) {
-                plusStart = line.indexB;
-                firstPlus = false;
-            }
+            if (!plusStart) plusStart = line.indexB + 1;
             break;
         default:
             break;
@@ -193,9 +177,9 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
     }
 
     HunkRange range;
-    range.minusL = minusStart + 1;
+    range.minusL = minusStart;
     range.minusS = minusRange;
-    range.plusL = plusStart + 1;
+    range.plusL = plusStart;
     range.plusS = plusRange;
     ranges << range;
 
