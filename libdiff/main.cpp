@@ -136,7 +136,6 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
     }
 
     QList<HunkRange> ranges;
-    int contextRange = 0;
     int minusStart = 0;
     int minusRange = 0;
     int plusStart = 0;
@@ -156,11 +155,10 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
             }
             HunkRange range;
             range.minusL = minusStart + 1;
-            range.minusS = minusRange + contextRange;
+            range.minusS = minusRange;
             range.plusL = plusStart + 1;
-            range.plusS = plusRange + contextRange;
+            range.plusS = plusRange;
             ranges << range;
-            contextRange = 0;
             minusStart = 0;
             minusRange = 0;
             plusStart = 0;
@@ -170,7 +168,8 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
             firstPlus = true;
             break;
         case DiffLine::Context:
-            contextRange++;
+            plusRange++;
+            minusRange++;
             if (firstMinus) {
                 minusStart = line.indexA;
                 firstMinus = false;
@@ -201,9 +200,9 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
 
     HunkRange range;
     range.minusL = minusStart + 1;
-    range.minusS = minusRange + contextRange;
+    range.minusS = minusRange;
     range.plusL = plusStart + 1;
-    range.plusS = plusRange + contextRange;
+    range.plusS = plusRange;
     ranges << range;
 
     QByteArray diff;
