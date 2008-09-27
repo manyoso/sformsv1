@@ -45,7 +45,22 @@ private:
     QVector<int> m_vector;
 };
 
-int lcs_lengthLines(const QByteArray &a, const QByteArray &b)
+struct HunkRange {
+    int plusL;
+    int plusS;
+    int minusL;
+    int minusS;
+};
+
+struct DiffLine {
+    enum Type { Context, Minus, Plus, Hunk };
+    Type type;
+    int indexA;
+    int indexB;
+    QByteArray line;
+};
+
+QByteArray diff(const QByteArray &a, const QByteArray &b)
 {
     QList<QByteArray> aLines = a.split('\n');
     QList<QByteArray> bLines = b.split('\n');
@@ -66,79 +81,154 @@ int lcs_lengthLines(const QByteArray &a, const QByteArray &b)
 
     //l.print();
 
-    const int length = l.value(0, 0);
+    QList<DiffLine> lines;
+    int i = 0;
+    int j = 0;
+    while (i < aSize || j < bSize) {
+        DiffLine line;
+        bool exhaustedA = i >= aSize;
+        bool exhaustedB = j >= bSize;
+        QByteArray a = !exhaustedA ? aLines.at(i) : QByteArray();
+        QByteArray b = !exhaustedB ? bLines.at(j) : QByteArray();
+        if (!exhaustedA && !exhaustedB && a == b) {
+            line.type = DiffLine::Context;
+            line.indexA = i;
+            line.indexB = j;
+            line.line = " " + a;
+            i++; j++;
+        } else if (!exhaustedA && l.value(i+1, j) >= l.value(i, j+1)) {
+            line.type = DiffLine::Minus;
+            line.indexA = i;
+            line.indexB = -1;
+            line.line = "-" + a;
+            i++;
+        } else if (!exhaustedB) {
+            line.type = DiffLine::Plus;
+            line.indexA = -1;
+            line.indexB = j;
+            line.line = "+" + b;
+            j++;
+        }
+        lines << line;
+    }
+
+    DiffLine hunk;
+    hunk.type = DiffLine::Hunk;
+    hunk.indexA = -1;
+    hunk.indexB = -1;
+    hunk.line = QString("@@ -%1,%2 +%3,%4 @@").toLatin1();
+    lines.insert(0, hunk);
+
+    int contextCount = 0;
+    for (int i = 0; i < lines.count(); ++i) {
+        DiffLine line = lines.at(i);
+
+        if (line.type == DiffLine::Context)
+            contextCount++;
+        else
+            contextCount = 0;
+
+        if (contextCount == 6)
+            lines.insert(i - 2, hunk);
+
+        if (contextCount > 6)
+            lines.removeAt(i - 2);
+    }
+
+    QList<HunkRange> ranges;
+    int contextRange = 0;
+    int minusStart = 0;
+    int minusRange = 0;
+    int plusStart = 0;
+    int plusRange = 0;
+    bool newHunk = false;
+    bool firstMinus = false;
+    bool firstPlus = false;
+    for (int i = 0; i < lines.count(); ++i) {
+        DiffLine line = lines.at(i);
+
+        switch (line.type)
+        {
+        case DiffLine::Hunk:
+            if (!newHunk) {
+                newHunk = true;
+                continue;
+            }
+            HunkRange range;
+            range.minusL = minusStart + 1;
+            range.minusS = minusRange + contextRange;
+            range.plusL = plusStart + 1;
+            range.plusS = plusRange + contextRange;
+            ranges << range;
+            contextRange = 0;
+            minusStart = 0;
+            minusRange = 0;
+            plusStart = 0;
+            plusRange = 0;
+            newHunk = true;
+            firstMinus = true;
+            firstPlus = true;
+            break;
+        case DiffLine::Context:
+            contextRange++;
+            if (firstMinus) {
+                minusStart = line.indexA;
+                firstMinus = false;
+            }
+            if (firstPlus) {
+                plusStart = line.indexB;
+                firstPlus = false;
+            }
+            break;
+        case DiffLine::Minus:
+            minusRange++;
+            if (firstMinus) {
+                minusStart = line.indexA;
+                firstMinus = false;
+            }
+            break;
+        case DiffLine::Plus:
+            plusRange++;
+            if (firstPlus) {
+                plusStart = line.indexB;
+                firstPlus = false;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    HunkRange range;
+    range.minusL = minusStart + 1;
+    range.minusS = minusRange + contextRange;
+    range.plusL = plusStart + 1;
+    range.plusS = plusRange + contextRange;
+    ranges << range;
 
     QByteArray diff;
-    int i = 0;
-    int j = 0;
-    while (i < aSize && j < bSize) {
-        if (aLines.at(i) == bLines.at(j)) {
-            diff.append(" " + aLines.at(i) + "\n");
-            i++; j++;
-        } else if (l.value(i+1, j) >= l.value(i, j+1)) {
-            diff.append("-" + aLines.at(i) + "\n");
-            i++;
-        } else {
-            diff.append("+" + bLines.at(j) + "\n");
-            j++;
+    for (int i = 0; i < lines.count(); ++i) {
+        DiffLine line = lines.at(i);
+
+        if (line.type == DiffLine::Hunk) {
+            HunkRange range = ranges.takeFirst();
+            QString hunk = line.line;
+            hunk = hunk.arg(range.minusL).arg(range.minusS).arg(range.plusL).arg(range.plusS);
+            line.line = hunk.toLatin1();
         }
+
+/*        qDebug() << line.type
+                 << line.indexA
+                 << line.indexB
+                 << line.line;*/
+        diff.append(line.line + "\n");
     }
 
-    qDebug() << diff;
-
-    return length;
-}
-
-int lcs_length(const QByteArray &a, const QByteArray &b)
-{
-    const int aSize = a.size();
-    const int bSize = b.size();
-
-    LCSLengths l(aSize, bSize);
-
-    for (int i = aSize - 1; i >= 0; i--) {
-        for (int j = bSize - 1; j >= 0; j--) {
-            if (a.at(i) == b.at(j)) {
-                l.setValue(i, j, 1 + l.value(i+1, j+1));
-            } else {
-                l.setValue(i, j, qMax(l.value(i+1, j), l.value(i, j+1)));
-            }
-        }
-    }
-
-    //l.print();
-
-    const int length = l.value(0, 0);
-
-    QByteArray longestSubSequence;
-    int i = 0;
-    int j = 0;
-    while (i < aSize && j < bSize) {
-        if (a.at(i)==b.at(j)) {
-            longestSubSequence.append(a.at(i));
-            i++; j++;
-        } else if (l.value(i+1, j) >= l.value(i, j+1)) {
-            i++;
-        } else {
-            j++;
-        }
-    }
-
-    qDebug() << "longestSubSequence" << longestSubSequence;
-
-    return length;
+    return diff;
 }
 
 int main(int, char **)
 {
-#if 0
-    QString a("nematode knowledge");
-    QString b("empty bottle");
-
-    //emt ole is the solution...
-    qDebug() << "length" << lcs_length(a.toLatin1(), b.toLatin1());
-#else
-
     QString a("This part of the\n"
               "document has stayed the\n"
               "same from version to\n"
@@ -162,9 +252,10 @@ int main(int, char **)
               "Nothing in the rest of\n"
               "this paragraph needs to\n"
               "be changed. Things can\n"
-              "be added after it.\n");
+              "be added after it.");
 
-    QString b("This is an important\n"
+    QString b(
+              "This is an important\n"
               "notice! It should\n"
               "therefore be located at\n"
               "the beginning of this\n"
@@ -191,10 +282,9 @@ int main(int, char **)
               "\n"
               "This paragraph contains\n"
               "important new additions\n"
-              "to this document.\n");
+              "to this document.");
 
-    qDebug() << "length" << lcs_lengthLines(a.toLatin1(), b.toLatin1());
-#endif
+    qDebug() << "diff:\n" << diff(a.toLatin1(), b.toLatin1());
 
     return 0;
 }
