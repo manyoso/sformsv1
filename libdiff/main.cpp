@@ -194,8 +194,8 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
 
     QByteArray diff;
 
-    diff.append(QLatin1String("--- a\n"));
-    diff.append(QLatin1String("+++ b\n"));
+    diff.append(QLatin1String("--- original\n"));
+    diff.append(QLatin1String("+++ modified\n"));
 
     for (int i = 0; i < lines.count(); ++i) {
         DiffLine line = lines.at(i);
