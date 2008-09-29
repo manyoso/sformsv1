@@ -6,6 +6,7 @@
 
 int main(int, char **)
 {
+#if 0
     QString a("This part of the\n"
               "document has stayed the\n"
               "same from version to\n"
@@ -62,6 +63,11 @@ int main(int, char **)
               "to this document.\n");
 
     qDebug() << "diff:\n" << QtDiff::diff(a.toLatin1(), b.toLatin1());
+#else
+    qDebug() << "diff:\n" << QtDiff::diff(
+                                QLatin1String("/home/manyoso/dev/sforms/libqtdiff/test/original"),
+                                QLatin1String( "/home/manyoso/dev/sforms/libqtdiff/test/modified"));
+#endif
 
     return 0;
 }

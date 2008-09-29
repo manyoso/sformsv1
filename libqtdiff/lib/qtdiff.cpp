@@ -1,5 +1,6 @@
 #include "qtdiff.h"
 
+#include <QFile>
 #include <QDebug>
 #include <QByteArray>
 
@@ -60,6 +61,19 @@ struct DiffLine {
     int indexB;
     QByteArray line;
 };
+
+QByteArray QtDiff::diff(const QString &a, const QString &b)
+{
+    QFile original(a);
+    QFile modified(b);
+    if (!original.exists() || !original.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QByteArray();
+    if (!modified.exists() || !modified.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QByteArray();
+
+    return diff(QByteArray::fromRawData(reinterpret_cast<const char*>(original.map(0, original.size())), original.size()),
+                QByteArray::fromRawData(reinterpret_cast<const char*>(modified.map(0, modified.size())), modified.size()));
+}
 
 QByteArray QtDiff::diff(const QByteArray &a, const QByteArray &b)
 {
