@@ -1,73 +1,17 @@
-#include <QCoreApplication>
-
 #include <qtdiff.h>
 
-#include <QDebug>
+#include <QtCore>
+#include <iostream>
 
-int main(int, char **)
+int main(int argc, char **argv)
 {
-#if 0
-    QString a("This part of the\n"
-              "document has stayed the\n"
-              "same from version to\n"
-              "version.  It shouldn't\n"
-              "be shown if it doesn't\n"
-              "change.  Otherwise, that\n"
-              "would not be helping to\n"
-              "compress the size of the\n"
-              "changes.\n"
-              "\n"
-              "This paragraph contains\n"
-              "text that is outdated.\n"
-              "It will be deleted in the\n"
-              "near future.\n"
-              "\n"
-              "It is important to spell\n"
-              "check this dokument. On\n"
-              "the other hand, a\n"
-              "misspelled word isn't\n"
-              "the end of the world.\n"
-              "Nothing in the rest of\n"
-              "this paragraph needs to\n"
-              "be changed. Things can\n"
-              "be added after it.\n");
+    if (argc != 3)
+        return -1;
 
-    QString b(
-              "This is an important\n"
-              "notice! It should\n"
-              "therefore be located at\n"
-              "the beginning of this\n"
-              "document!\n"
-              "\n"
-              "This part of the\n"
-              "document has stayed the\n"
-              "same from version to\n"
-              "version.  It shouldn't\n"
-              "be shown if it doesn't\n"
-              "change.  Otherwise, that\n"
-              "would not be helping to\n"
-              "compress anything.\n"
-              "\n"
-              "It is important to spell\n"
-              "check this document. On\n"
-              "the other hand, a\n"
-              "misspelled word isn't\n"
-              "the end of the world.\n"
-              "Nothing in the rest of\n"
-              "this paragraph needs to\n"
-              "be changed. Things can\n"
-              "be added after it.\n"
-              "\n"
-              "This paragraph contains\n"
-              "important new additions\n"
-              "to this document.\n");
+    QString original = argv[1];
+    QString modified = argv[2];
 
-    qDebug() << "diff:\n" << QtDiff::diff(a.toLatin1(), b.toLatin1());
-#else
-    qDebug() << "diff:\n" << QtDiff::diff(
-                                QLatin1String("/home/manyoso/dev/sforms/libqtdiff/test/original"),
-                                QLatin1String( "/home/manyoso/dev/sforms/libqtdiff/test/modified"));
-#endif
+    std::cout << QtDiff::diff(original, modified).constData();
 
     return 0;
 }
