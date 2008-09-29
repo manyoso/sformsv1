@@ -64,6 +64,17 @@ QByteArray diff(const QByteArray &a, const QByteArray &b)
 {
     QList<QByteArray> aLines = a.split('\n');
     QList<QByteArray> bLines = b.split('\n');
+
+    while (!aLines.isEmpty() && !bLines.isEmpty() && aLines.first() == bLines.first()) {
+        aLines.removeFirst();
+        bLines.removeFirst();
+    }
+
+    while (!aLines.isEmpty() && !bLines.isEmpty() && aLines.last() == bLines.last()) {
+        aLines.removeLast();
+        bLines.removeLast();
+    }
+
     const int aSize = aLines.size();
     const int bSize = bLines.size();
 
@@ -223,7 +234,7 @@ int main(int, char **)
               "Nothing in the rest of\n"
               "this paragraph needs to\n"
               "be changed. Things can\n"
-              "be added after it.");
+              "be added after it.\n");
 
     QString b(
               "This is an important\n"
@@ -253,7 +264,7 @@ int main(int, char **)
               "\n"
               "This paragraph contains\n"
               "important new additions\n"
-              "to this document.");
+              "to this document.\n");
 
     qDebug() << "diff:\n" << diff(a.toLatin1(), b.toLatin1());
 
