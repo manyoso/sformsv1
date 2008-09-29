@@ -3,9 +3,9 @@ include($$PWD/../../sforms.pri)
 HEADERS +=
 SOURCES += main.cpp
 INCLUDEPATH += $$PWD/../lib/
-LIBS += -L$$PWD/../lib -lQtDiff
+LIBS += -lQtDiff
 
-#DESTDIR = $$OUTPUT_DIR/bin
+DESTDIR = $$OUTPUT_DIR/bin
 
 TEMPLATE = app
 TARGET = qtdiff

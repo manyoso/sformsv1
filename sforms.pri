@@ -6,7 +6,7 @@
 
 QT += core
 
-#CONFIG += silent
+CONFIG += silent
 CONFIG += console
 
 TOPLEVELDIR = $$PWD
